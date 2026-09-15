@@ -43,7 +43,7 @@ export function BalanceCard({ balance }: { balance: Balance }) {
       </div>
       {balance.openingCents !== 0 && (
         <p className="balance-note">
-          Incluye {formatDop(balance.openingCents)} de saldo inicial. Se ajusta en Configuracion.
+          Incluye {formatDop(balance.openingCents)} de saldo inicial. Se ajusta en Configuración.
         </p>
       )}
     </section>

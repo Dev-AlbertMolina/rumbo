@@ -3,7 +3,7 @@ import { NAV_ITEMS } from "./nav-items";
 
 export function BottomNav({ pathname }: { pathname: string }) {
   return (
-    <nav className="bottom-nav" aria-label="Navegacion movil">
+    <nav className="bottom-nav" aria-label="Navegación móvil">
       {NAV_ITEMS.map(({ path, Icon, label }) => (
         <RouteLink
           key={path}

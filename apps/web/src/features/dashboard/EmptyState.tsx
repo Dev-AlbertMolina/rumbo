@@ -10,8 +10,8 @@ export function EmptyState({
   return (
     <IllustratedEmptyState
       eyebrow="Comienza con lo esencial"
-      title="Todavia no podemos calcular tu disponible"
-      description="Registra tu sueldo o primer ingreso y luego anade tus gastos. Veras como cambia el dinero que te queda."
+      title="Todavía no podemos calcular tu disponible"
+      description="Registra tu sueldo o primer ingreso y luego añade tus gastos. Verás cómo cambia el dinero que te queda."
       action={
         <>
           <button className="primary" onClick={onIncome}>

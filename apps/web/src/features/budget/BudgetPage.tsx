@@ -6,11 +6,13 @@ import {
   type Summary
 } from "@ahorra/domain";
 import { AlertTriangle, Pencil, Plus, Trash2 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { type FormEvent, useEffect, useState } from "react";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { MoneyInput } from "../../components/MoneyInput";
 import { PageTitle } from "../../components/PageTitle";
 import { Stat } from "../../components/Stat";
+import { toast } from "../../components/Toaster";
 import { apiFetch } from "../../lib/api";
 import { expenseCategories } from "../../lib/categories";
 import { CategoryIcon } from "../../lib/categoryIcons";
@@ -35,7 +37,6 @@ export function BudgetPage({
 }) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
   const [addingCategory, setAddingCategory] = useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [categoryError, setCategoryError] = useState("");
@@ -44,12 +45,6 @@ export function BudgetPage({
   const [editError, setEditError] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<ExpenseCategory | null>(null);
-
-  useEffect(() => {
-    if (!message) return;
-    const timer = setTimeout(() => setMessage(""), 4000);
-    return () => clearTimeout(timer);
-  }, [message]);
 
   const customCategoryNames = customCategories.map((c) => c.name);
   const categories = [
@@ -91,7 +86,6 @@ export function BudgetPage({
 
   async function saveBudget() {
     setSaving(true);
-    setMessage("");
     try {
       await Promise.all(
         categories.map(async (category) => {
@@ -108,10 +102,10 @@ export function BudgetPage({
           if (!response.ok) throw new Error();
         })
       );
-      setMessage("Presupuesto guardado correctamente.");
+      toast("Presupuesto guardado");
       onSaved();
     } catch {
-      setMessage("No pudimos guardar el presupuesto.");
+      toast("No pudimos guardar el presupuesto.", "error");
     } finally {
       setSaving(false);
     }
@@ -128,13 +122,13 @@ export function BudgetPage({
     if (!response.ok) {
       const body = (await response
         .json()
-        .catch(() => ({ message: "No pudimos crear la categoria." }))) as { message?: string };
-      setCategoryError(body.message ?? "No pudimos crear la categoria.");
+        .catch(() => ({ message: "No pudimos crear la categoría." }))) as { message?: string };
+      setCategoryError(body.message ?? "No pudimos crear la categoría.");
       return;
     }
     setCategoryName("");
     setAddingCategory(false);
-    setMessage("Categoria agregada correctamente.");
+    toast("Categoría agregada");
     onSaved();
   }
 
@@ -156,12 +150,12 @@ export function BudgetPage({
     if (!response.ok) {
       const body = (await response
         .json()
-        .catch(() => ({ message: "No pudimos editar la categoria." }))) as { message?: string };
-      setEditError(body.message ?? "No pudimos editar la categoria.");
+        .catch(() => ({ message: "No pudimos editar la categoría." }))) as { message?: string };
+      setEditError(body.message ?? "No pudimos editar la categoría.");
       return;
     }
     setEditingCategory(null);
-    setMessage("Categoria actualizada correctamente.");
+    toast("Categoría actualizada");
     onSaved();
   }
 
@@ -170,10 +164,10 @@ export function BudgetPage({
     const response = await apiFetch(accessToken, `/api/categories/${cat.id}`, { method: "DELETE" });
     setDeletingId(null);
     if (!response.ok) {
-      setMessage("No pudimos eliminar la categoria.");
+      toast("No pudimos eliminar la categoría.", "error");
       return;
     }
-    setMessage(`Categoria "${cat.name}" eliminada.`);
+    toast(`Categoría "${cat.name}" eliminada`);
     onSaved();
   }
 
@@ -182,11 +176,11 @@ export function BudgetPage({
       <PageTitle
         eyebrow="Plan del periodo"
         title="Presupuesto"
-        description={`Define cuanto quieres gastar durante ${monthLabel(month)}.`}
+        description={`Define cuánto quieres gastar durante ${monthLabel(month)}.`}
         action={
           <div className="button-row">
             <button className="secondary" onClick={() => setAddingCategory(true)}>
-              <Plus size={16} /> Nueva categoria
+              <Plus size={16} /> Nueva categoría
             </button>
             <button className="primary" onClick={() => void saveBudget()} disabled={saving}>
               {saving ? "Guardando..." : "Guardar presupuesto"}
@@ -197,7 +191,7 @@ export function BudgetPage({
       {addingCategory && (
         <form className="category-creator" onSubmit={(event) => void createCategory(event)}>
           <label>
-            Nombre de la categoria
+            Nombre de la categoría
             <input
               autoFocus
               value={categoryName}
@@ -219,7 +213,7 @@ export function BudgetPage({
             >
               Cancelar
             </button>
-            <button className="primary">Agregar categoria</button>
+            <button className="primary">Agregar categoría</button>
           </div>
           {categoryError && <p role="alert">{categoryError}</p>}
         </form>
@@ -231,21 +225,16 @@ export function BudgetPage({
         <Stat label="Disponible" value={summary.availableAfterSavingsCents} tone="income" />
       </div>
       <p className="budget-formula">
-        Disponible = ingresos - gastos - ahorro separado. El presupuesto por categoria sirve como
-        limite, no como saldo.
+        Disponible = ingresos - gastos - ahorro separado. El presupuesto por categoría sirve como
+        límite, no como saldo.
       </p>
-      {message && (
-        <p className="save-message" role="status">
-          {message}
-        </p>
-      )}
       <section className="panel module-panel budget-editor">
         <header>
           <div>
-            <p className="eyebrow">Categorias</p>
-            <h2>Limites del mes</h2>
+            <p className="eyebrow">Categorías</p>
+            <h2>Límites del mes</h2>
           </div>
-          <span>Plan por categoria</span>
+          <span>Plan por categoría</span>
         </header>
         {categories.map((category) => {
           const spent =
@@ -334,23 +323,23 @@ export function BudgetPage({
                     </div>
                     {alertLevels.get(category) === "OVER" ? (
                       <p className="budget-flag over">
-                        <AlertTriangle size={14} aria-hidden="true" /> Te pasaste del limite
+                        <AlertTriangle size={14} aria-hidden="true" /> Te pasaste del límite
                       </p>
                     ) : alertLevels.get(category) === "NEAR" ? (
                       <p className="budget-flag near">
                         <AlertTriangle size={14} aria-hidden="true" /> Ya usaste el {percent}% del
-                        limite
+                        límite
                       </p>
                     ) : null}
                   </>
                 ) : (
                   <span className="no-limit-message">
-                    Define un limite para comparar este gasto.
+                    Define un límite para comparar este gasto.
                   </span>
                 )}
               </div>
               <label className="limit-field">
-                <span>Limite mensual</span>
+                <span>Límite mensual</span>
                 <div className="compact-money">
                   <span>RD$</span>
                   <MoneyInput
@@ -364,19 +353,22 @@ export function BudgetPage({
           );
         })}
       </section>
-      {pendingDelete && (
-        <ConfirmDialog
-          title="Eliminar categoria"
-          description={`¿Eliminar la categoria "${pendingDelete.name}"? Esta accion no se puede deshacer.`}
-          confirmLabel="Eliminar"
-          danger
-          onCancel={() => setPendingDelete(null)}
-          onConfirm={() => {
-            void deleteCategory(pendingDelete);
-            setPendingDelete(null);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {pendingDelete && (
+          <ConfirmDialog
+            key="delete-category"
+            title="Eliminar categoría"
+            description={`¿Eliminar la categoría "${pendingDelete.name}"? Esta acción no se puede deshacer.`}
+            confirmLabel="Eliminar"
+            danger
+            onCancel={() => setPendingDelete(null)}
+            onConfirm={() => {
+              void deleteCategory(pendingDelete);
+              setPendingDelete(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

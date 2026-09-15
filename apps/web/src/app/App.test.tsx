@@ -1,3 +1,7 @@
+// La cola sin conexion (Dexie) abre IndexedDB al montar la app, y jsdom no lo
+// trae: sin esto cada prueba dejaba errores sueltos y vitest salia con fallo
+// aunque todas pasaran.
+import "fake-indexeddb/auto";
 import "@testing-library/jest-dom/vitest";
 import { formatDop } from "@ahorra/domain";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
@@ -68,7 +72,7 @@ describe("App", () => {
     render(<App />);
 
     await waitFor(() =>
-      expect(screen.getByRole("heading", { name: /todavia no podemos/i })).toBeInTheDocument()
+      expect(screen.getByRole("heading", { name: /todavía no podemos/i })).toBeInTheDocument()
     );
     expect(screen.getByRole("button", { name: "Registrar ingreso" })).toBeInTheDocument();
   });
@@ -216,7 +220,7 @@ describe("App", () => {
     expect(await screen.findByText(formatDop(84_000))).toBeInTheDocument();
     expect(screen.queryByText(formatDop(-1_240_000))).not.toBeInTheDocument();
     expect(
-      screen.getAllByText("Define un limite para comparar este gasto.").length
+      screen.getAllByText("Define un límite para comparar este gasto.").length
     ).toBeGreaterThan(0);
   });
 
@@ -273,7 +277,7 @@ describe("App", () => {
     expect(within(table).queryByText("Movimiento 1")).not.toBeInTheDocument();
     expect(
       screen.getByText(
-        (_, element) => element?.tagName === "SPAN" && element.textContent === "Pagina 2 de 2"
+        (_, element) => element?.tagName === "SPAN" && element.textContent === "Página 2 de 2"
       )
     ).toBeInTheDocument();
   });
@@ -302,9 +306,9 @@ describe("App", () => {
     });
 
     render(<App />);
-    fireEvent.click(await screen.findByRole("button", { name: "Nueva categoria" }));
-    expect(screen.getByLabelText("Nombre de la categoria")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Agregar categoria" })).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: "Nueva categoría" }));
+    expect(screen.getByLabelText("Nombre de la categoría")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Agregar categoría" })).toBeInTheDocument();
   });
 
   it("explains a negative available amount after savings", async () => {

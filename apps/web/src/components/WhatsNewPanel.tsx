@@ -1,7 +1,9 @@
+import { m, useReducedMotion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { navigate } from "../app/router";
 import { LATEST_RELEASE } from "../features/whatsnew/releases";
 import { useDialog } from "../hooks/useDialog";
+import { backdropMotion, popMotion } from "../lib/motion";
 
 /**
  * Aviso de novedades, los primeros dias tras publicar una version.
@@ -11,28 +13,31 @@ import { useDialog } from "../hooks/useDialog";
  */
 export function WhatsNewPanel({ onClose }: { onClose: () => void }) {
   const dialogRef = useDialog<HTMLElement>(onClose);
+  const reduceMotion = useReducedMotion();
 
   return (
-    <div
+    <m.div
       className="dialog-backdrop confirm-backdrop"
       role="presentation"
+      {...backdropMotion}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <section
+      <m.section
         ref={dialogRef}
         className="whats-new-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="whats-new-title"
+        {...popMotion(reduceMotion)}
       >
         <span className="whats-new-icon" aria-hidden="true">
           <Sparkles size={22} />
         </span>
         <h2 id="whats-new-title">Novedades en Rumbo</h2>
         <p className="muted">
-          Version {LATEST_RELEASE.version} · {LATEST_RELEASE.title}
+          Versión {LATEST_RELEASE.version} · {LATEST_RELEASE.title}
         </p>
         <ul className="whats-new-list">
           {LATEST_RELEASE.entries.map((entry) => (
@@ -53,7 +58,7 @@ export function WhatsNewPanel({ onClose }: { onClose: () => void }) {
             Entendido
           </button>
         </div>
-      </section>
-    </div>
+      </m.section>
+    </m.div>
   );
 }

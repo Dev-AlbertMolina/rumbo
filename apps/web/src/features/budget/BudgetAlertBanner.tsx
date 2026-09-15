@@ -33,8 +33,8 @@ export function BudgetAlertBanner({
         <div>
           <strong>
             {over
-              ? `Te pasaste del limite en ${alerts.overCount} ${alerts.overCount === 1 ? "categoria" : "categorias"}`
-              : `Estas cerca del limite en ${alerts.nearCount} ${alerts.nearCount === 1 ? "categoria" : "categorias"}`}
+              ? `Te pasaste del límite en ${alerts.overCount} ${alerts.overCount === 1 ? "categoría" : "categorías"}`
+              : `Estás cerca del límite en ${alerts.nearCount} ${alerts.nearCount === 1 ? "categoría" : "categorías"}`}
           </strong>
           <ul className="budget-alert-list">
             {flagged.slice(0, 3).map((item) => (
@@ -45,7 +45,7 @@ export function BudgetAlertBanner({
                   : `quedan ${formatDop(item.remainingCents)} de ${formatDop(item.limitCents)}`}
               </li>
             ))}
-            {flagged.length > 3 && <li>y {flagged.length - 3} mas</li>}
+            {flagged.length > 3 && <li>y {flagged.length - 3} más</li>}
           </ul>
         </div>
       </div>

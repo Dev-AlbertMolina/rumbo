@@ -23,7 +23,7 @@ export async function apiFetch(
   input: RequestInfo | URL,
   init: RequestInit = {}
 ): Promise<Response> {
-  if (!accessToken) throw new Error("Necesitas iniciar sesion.");
+  if (!accessToken) throw new Error("Necesitas iniciar sesión.");
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bearer ${accessToken}`);
   return fetch(resolveApiUrl(input), { ...init, headers });

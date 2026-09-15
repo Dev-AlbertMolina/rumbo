@@ -68,7 +68,7 @@ export function OpeningBalanceCard({
       {editing ? (
         <form onSubmit={(event) => void save(event)} className="opening-balance-form">
           <label>
-            Dinero que ya tenias antes del primer movimiento
+            Dinero que ya tenías antes del primer movimiento
             <div className="compact-money">
               <span>RD$</span>
               <MoneyInput autoFocus value={value} onChange={setValue} placeholder="0" />

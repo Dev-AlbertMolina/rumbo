@@ -37,13 +37,13 @@ describe("GoalPaceNote", () => {
     render(<GoalPaceNote goal={goal({ savedCents: 10_000_00 })} />);
 
     expect(screen.getByText(/RD\$22,500/)).toBeInTheDocument();
-    expect(screen.getByText(/ponerte al dia/)).toBeInTheDocument();
+    expect(screen.getByText(/ponerte al día/)).toBeInTheDocument();
   });
 
   it("asks for a decision instead of a monthly amount once the date passed", () => {
     render(<GoalPaceNote goal={goal({ savedCents: 1_00, targetDate: "2026-10-01" })} />);
 
-    expect(screen.getByText(/La fecha ya paso/)).toBeInTheDocument();
+    expect(screen.getByText(/La fecha ya pasó/)).toBeInTheDocument();
     expect(screen.queryByText(/al mes/)).not.toBeInTheDocument();
   });
 

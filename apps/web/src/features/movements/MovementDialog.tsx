@@ -1,9 +1,19 @@
 import { formatDop, type Movement, type MovementStatus, type MovementType } from "@ahorra/domain";
+import {
+  m,
+  useDragControls,
+  useReducedMotion,
+  type HTMLMotionProps,
+  type PanInfo
+} from "framer-motion";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { MoneyInput } from "../../components/MoneyInput";
 import { ReceiptField } from "../../components/ReceiptField";
+import { toast } from "../../components/Toaster";
 import { useDialog } from "../../hooks/useDialog";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { backdropMotion, DURATION, EASE_DRAWER, EASE_OUT } from "../../lib/motion";
 import { expenseCategories, incomeCategories } from "../../lib/categories";
 import { today } from "../../lib/format";
 import { apiFetch } from "../../lib/api";
@@ -31,6 +41,9 @@ export function MovementDialog({
   onSaved: () => void;
 }) {
   const dialogRef = useDialog<HTMLElement>(onClose);
+  const phone = useMediaQuery("(max-width: 600px)");
+  const reduceMotion = useReducedMotion();
+  const dragControls = useDragControls();
   const [type, setType] = useState<MovementType>(initialType);
   const [status, setStatus] = useState<MovementStatus>(movement?.status ?? "REGISTERED");
   const [amount, setAmount] = useState(movement ? String(movement.amountCents / 100) : "");
@@ -53,6 +66,36 @@ export function MovementDialog({
   const nextImpact = status === "REGISTERED" ? (type === "INCOME" ? amountCents : -amountCents) : 0;
   const impact = availableCents - previousImpact + nextImpact;
   const categories = type === "INCOME" ? incomeCategories : expenseOptions;
+
+  // En escritorio el panel entra desde la derecha. En el telefono ocupa la
+  // pantalla y sube desde abajo, como las hojas del sistema, y se cierra
+  // arrastrando la cabecera hacia abajo: basta un gesto rapido aunque sea
+  // corto. El arrastre mueve el panel con `y`, asi que ahi no sirve el
+  // transform escrito a mano del escritorio.
+  const sheetMotion: HTMLMotionProps<"section"> = phone
+    ? {
+        initial: { y: "100%" },
+        animate: { y: 0 },
+        exit: { y: "100%", transition: { duration: DURATION.base, ease: EASE_OUT } },
+        transition: { duration: DURATION.drawer, ease: EASE_DRAWER },
+        drag: "y",
+        dragListener: false,
+        dragControls,
+        dragConstraints: { top: 0, bottom: 0 },
+        dragElastic: { top: 0, bottom: 0.8 },
+        onDragEnd: (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+          if (info.offset.y > 120 || info.velocity.y > 500) onClose();
+        }
+      }
+    : {
+        initial: { transform: reduceMotion ? "translateX(0%)" : "translateX(100%)" },
+        animate: { transform: "translateX(0%)" },
+        exit: {
+          transform: reduceMotion ? "translateX(0%)" : "translateX(100%)",
+          transition: { duration: DURATION.base, ease: EASE_OUT }
+        },
+        transition: { duration: DURATION.drawer, ease: EASE_DRAWER }
+      };
 
   function changeType(next: MovementType) {
     setType(next);
@@ -90,6 +133,9 @@ export function MovementDialog({
         }
       );
       if (!response.ok) throw new Error("No pudimos guardar el movimiento.");
+      toast(
+        movement ? "Cambios guardados" : type === "INCOME" ? "Ingreso guardado" : "Gasto guardado"
+      );
       onSaved();
     } catch (reason) {
       // Un fetch que revienta es falta de red; un 4xx habria devuelto una
@@ -98,6 +144,7 @@ export function MovementDialog({
       const offline = reason instanceof TypeError && !movement;
       if (offline) {
         await queueMovement(userId, payload);
+        toast("Guardado sin conexión: se sube solo cuando vuelva la señal", "info");
         onSaved();
       } else {
         setError(reason instanceof Error ? reason.message : "No pudimos guardar el movimiento.");
@@ -108,21 +155,28 @@ export function MovementDialog({
   }
 
   return (
-    <div
+    <m.div
       className="dialog-backdrop"
       role="presentation"
+      {...backdropMotion}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <section
+      <m.section
         ref={dialogRef}
         className="movement-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="dialog-title"
+        {...sheetMotion}
       >
-        <header>
+        <header onPointerDown={(event) => phone && dragControls.start(event)}>
+          {/* El asa solo se ve en el telefono; la cabecera entera sirve para
+              arrastrar, el asa solo lo anuncia. */}
+          <div className="sheet-grip" aria-hidden="true">
+            <span />
+          </div>
           <div>
             <p className="eyebrow">{movement ? "Editar movimiento" : "Nuevo movimiento"}</p>
             <h2 id="dialog-title">
@@ -163,7 +217,7 @@ export function MovementDialog({
           </label>
           <div className="form-row">
             <label>
-              Categoria <span>*</span>
+              Categoría <span>*</span>
               <select value={category} onChange={(event) => setCategory(event.target.value)}>
                 {categories.map((item) => (
                   <option key={item}>{item}</option>
@@ -176,7 +230,7 @@ export function MovementDialog({
             </label>
           </div>
           <label>
-            Descripcion <small>Opcional</small>
+            Descripción <small>Opcional</small>
             <input
               value={description}
               onChange={(event) => setDescription(event.target.value)}
@@ -209,7 +263,7 @@ export function MovementDialog({
           )}
           {amountCents > 0 && status === "REGISTERED" && (
             <div className="impact-card">
-              <span>Disponible despues de guardar</span>
+              <span>Disponible después de guardar</span>
               <strong>{formatDop(impact)}</strong>
             </div>
           )}
@@ -231,7 +285,7 @@ export function MovementDialog({
             </button>
           </div>
         </form>
-      </section>
-    </div>
+      </m.section>
+    </m.div>
   );
 }

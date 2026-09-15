@@ -19,11 +19,14 @@ import {
   TrendingDown,
   TrendingUp
 } from "lucide-react";
+import { AnimatePresence, m } from "framer-motion";
 import { OptionCards, type OptionCard } from "../../components/OptionCards";
 import { type FormEvent, useState } from "react";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { MoneyInput } from "../../components/MoneyInput";
+import { toast } from "../../components/Toaster";
 import { apiFetch } from "../../lib/api";
+import { collapseMotion } from "../../lib/motion";
 import { expenseCategories } from "../../lib/categories";
 import { today } from "../../lib/format";
 
@@ -152,6 +155,7 @@ export function RecurrencesPanel({
     }
     setOpen(false);
     setEditing(null);
+    toast(editing ? "Recurrencia actualizada" : "Recurrencia creada");
     onSaved();
   }
 
@@ -171,14 +175,24 @@ export function RecurrencesPanel({
         active: !rule.active
       })
     });
-    if (response.ok) onSaved();
+    if (!response.ok) {
+      toast("No pudimos cambiar la recurrencia.", "error");
+      return;
+    }
+    toast(rule.active ? "Recurrencia en pausa" : "Recurrencia reanudada");
+    onSaved();
   }
 
   async function remove(rule: RecurringMovement) {
     const response = await apiFetch(accessToken, `/api/recurrences/${rule.id}`, {
       method: "DELETE"
     });
-    if (response.ok) onSaved();
+    if (!response.ok) {
+      toast("No pudimos eliminar la recurrencia.", "error");
+      return;
+    }
+    toast("Recurrencia eliminada");
+    onSaved();
   }
 
   const activas = recurrences.filter((rule) => rule.active);
@@ -190,9 +204,9 @@ export function RecurrencesPanel({
 
   const resumen =
     recurrences.length === 0
-      ? "Ninguna configurada todavia"
+      ? "Ninguna configurada todavía"
       : `${activas.length} activa${activas.length === 1 ? "" : "s"}${
-          proxima ? ` · proxima el ${formatDay(proxima)}` : ""
+          proxima ? ` · próxima el ${formatDay(proxima)}` : ""
         }`;
 
   return (
@@ -225,238 +239,262 @@ export function RecurrencesPanel({
         )}
       </header>
 
-      {expanded && recurrences.length === 0 && !open && (
-        <p className="recurrences-empty">
-          El alquiler, el sueldo o una suscripcion no hace falta anotarlos cada mes. Declara la
-          regla una vez y Rumbo los registra el dia que toca.
-        </p>
-      )}
+      {/* Lo de debajo de la cabecera se abre y cierra animando su alto. */}
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <m.div key="recurrences-body" className="recurrences-body" {...collapseMotion}>
+            {recurrences.length === 0 && !open && (
+              <p className="recurrences-empty">
+                El alquiler, el sueldo o una suscripción no hace falta anotarlos cada mes. Declara
+                la regla una vez y Rumbo los registra el día que toca.
+              </p>
+            )}
 
-      {/* Sin reglas no se dibuja la lista: vacia solo aportaba un hueco entre
+            {/* Sin reglas no se dibuja la lista: vacia solo aportaba un hueco entre
           el titulo y el formulario. */}
-      {expanded && recurrences.length > 0 && (
-        <div className="recurrence-list">
-          {recurrences.map((rule) => (
-            <article className={`recurrence-row ${rule.active ? "" : "paused"}`} key={rule.id}>
-              {/*
+            {recurrences.length > 0 && (
+              <div className="recurrence-list">
+                {recurrences.map((rule) => (
+                  <article
+                    className={`recurrence-row ${rule.active ? "" : "paused"}`}
+                    key={rule.id}
+                  >
+                    {/*
                 Nombre y detalle van juntos en un bloque, y monto y botones en
                 otro. Sueltos en la rejilla los separaba la altura de los
                 botones, y quedaba un hueco entre las dos lineas del texto que
                 lo desligaba del icono.
               */}
-              <span className={`movement-icon ${rule.type.toLowerCase()}`}>
-                {rule.type === "CONTRIBUTION" ? <Target size={16} /> : <Repeat size={16} />}
-              </span>
-              <div className="recurrence-text">
-                <strong className="recurrence-name">{rule.description}</strong>
-                {/* Sin la categoria: el icono ya dice de que tipo es y el
+                    <span className={`movement-icon ${rule.type.toLowerCase()}`}>
+                      {rule.type === "CONTRIBUTION" ? <Target size={16} /> : <Repeat size={16} />}
+                    </span>
+                    <div className="recurrence-text">
+                      <strong className="recurrence-name">{rule.description}</strong>
+                      {/* Sin la categoria: el icono ya dice de que tipo es y el
                     nombre suele decir de que se trata, mientras que cada cuanto
                     y cuando toca la proxima son los dos datos que se miran. */}
-                <span className="recurrence-meta">
-                  {FREQUENCY_LABELS[rule.frequency]} ·{" "}
-                  {rule.active ? `proxima el ${formatDay(rule.nextRunDate)}` : "en pausa"}
-                </span>
-              </div>
-              <div className="recurrence-side">
-                <strong
-                  className={`recurrence-amount${rule.type === "INCOME" ? " amount-income" : ""}`}
-                >
-                  {rule.type === "INCOME" ? "+" : "−"}
-                  {formatDop(rule.amountCents)}
-                </strong>
-                <div className="recurrence-actions">
-                  <button
-                    className="table-action"
-                    title={rule.active ? "Pausar" : "Reanudar"}
-                    aria-label={`${rule.active ? "Pausar" : "Reanudar"} ${rule.description}`}
-                    onClick={() => void toggleActive(rule)}
-                  >
-                    {rule.active ? <Pause size={16} /> : <Play size={16} />}
-                  </button>
-                  <button
-                    className="table-action"
-                    title="Editar"
-                    aria-label={`Editar ${rule.description}`}
-                    onClick={() => startEdit(rule)}
-                  >
-                    <Pencil size={16} />
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-
-      {expanded && open && (
-        <form className="recurrence-form" onSubmit={(event) => void submit(event)}>
-          <OptionCards
-            name="recurrence-type"
-            legend="Que se repite"
-            value={form.type}
-            options={TYPE_OPTIONS.map((option) =>
-              option.value === "CONTRIBUTION"
-                ? { ...option, disabled: openGoals.length === 0 }
-                : option
-            )}
-            onChange={(type) => {
-              // Al pasar a aporte se elige la primera meta abierta, para que el
-              // formulario nunca quede en un estado invalido.
-              const goalId =
-                type === "CONTRIBUTION" ? ((form.goalId || openGoals[0]?.id) ?? "") : "";
-              const chosen = openGoals.find((item) => item.id === goalId);
-              setForm({
-                ...form,
-                type,
-                goalId,
-                description: form.description || (chosen ? `Aporte a ${chosen.name}` : "")
-              });
-            }}
-          />
-
-          <div className="form-grid">
-            <label className="form-grid-wide">
-              <span className="field-label">Cada cuanto</span>
-              {/* Tres opciones caben a la vista; en un desplegable habria que
-                  abrirlo solo para saber cuales son. */}
-              <div className="chip-row">
-                {recurrenceFrequencies.map((frequency) => (
-                  <button
-                    key={frequency}
-                    type="button"
-                    className={`period-chip${form.frequency === frequency ? " active" : ""}`}
-                    aria-pressed={form.frequency === frequency}
-                    onClick={() => setForm({ ...form, frequency })}
-                  >
-                    {FREQUENCY_LABELS[frequency]}
-                  </button>
+                      <span className="recurrence-meta">
+                        {FREQUENCY_LABELS[rule.frequency]} ·{" "}
+                        {rule.active ? `próxima el ${formatDay(rule.nextRunDate)}` : "en pausa"}
+                      </span>
+                    </div>
+                    <div className="recurrence-side">
+                      <strong
+                        className={`recurrence-amount${rule.type === "INCOME" ? " amount-income" : ""}`}
+                      >
+                        {rule.type === "INCOME" ? "+" : "−"}
+                        {formatDop(rule.amountCents)}
+                      </strong>
+                      <div className="recurrence-actions">
+                        <button
+                          className="table-action"
+                          title={rule.active ? "Pausar" : "Reanudar"}
+                          aria-label={`${rule.active ? "Pausar" : "Reanudar"} ${rule.description}`}
+                          onClick={() => void toggleActive(rule)}
+                        >
+                          {rule.active ? <Pause size={16} /> : <Play size={16} />}
+                        </button>
+                        <button
+                          className="table-action"
+                          title="Editar"
+                          aria-label={`Editar ${rule.description}`}
+                          onClick={() => startEdit(rule)}
+                        >
+                          <Pencil size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
                 ))}
               </div>
-            </label>
-            <label className="form-grid-wide">
-              Descripcion
-              <input
-                required
-                maxLength={160}
-                value={form.description}
-                onChange={(event) => setForm({ ...form, description: event.target.value })}
-                placeholder="Ej. Alquiler"
-              />
-            </label>
-            <label>
-              Monto
-              <div className="compact-money">
-                <span>RD$</span>
-                <MoneyInput
-                  required
-                  value={form.amount}
-                  onChange={(amount) => setForm({ ...form, amount })}
-                />
-              </div>
-            </label>
-            <label>
-              {isContribution ? "Meta" : "Categoria"}
-              {isContribution ? (
-                <select
-                  value={form.goalId}
-                  onChange={(event) => {
-                    const goalId = event.target.value;
-                    const chosen = openGoals.find((item) => item.id === goalId);
-                    setForm({
-                      ...form,
-                      goalId,
-                      // Se propone solo si el campo sigue vacio: nunca pisa lo
-                      // que la persona haya escrito.
-                      description: form.description || (chosen ? `Aporte a ${chosen.name}` : "")
-                    });
-                  }}
-                >
-                  {openGoals.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <select
-                  value={form.category}
-                  onChange={(event) => setForm({ ...form, category: event.target.value })}
-                >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </label>
-            <label>
-              Primera vez
-              <input
-                required
-                type="date"
-                value={form.startDate}
-                onChange={(event) => setForm({ ...form, startDate: event.target.value })}
-              />
-            </label>
-            <label>
-              <span className="field-label">
-                Hasta <small>Opcional</small>
-              </span>
-              <input
-                type="date"
-                min={form.startDate}
-                value={form.endDate}
-                onChange={(event) => setForm({ ...form, endDate: event.target.value })}
-              />
-            </label>
-          </div>
-          {/* Solo lo mensual tiene el problema del dia 31; en lo semanal el
-              aviso seria ruido sobre algo que no puede pasar. */}
-          {form.frequency === "MONTHLY" && (
-            <p className="recurrence-hint">
-              El dia de la primera vez marca el resto de la serie. Si eliges un 31, los meses cortos
-              usan su ultimo dia y luego vuelve al 31.
-            </p>
-          )}
-          {error && <p role="alert">{error}</p>}
-          <div className="dialog-actions recurrence-form-actions">
-            {/* Eliminar vive aqui y no en la fila: es irreversible, y en la
-                lista quedaba pegado al de editar, a un dedo de distancia. */}
-            {editing && (
-              <button
-                type="button"
-                className="text-button danger-text recurrence-delete"
-                onClick={() => setPendingDelete(editing)}
-              >
-                <Trash2 size={15} aria-hidden="true" /> Eliminar
-              </button>
             )}
-            <button type="button" className="secondary" onClick={() => setOpen(false)}>
-              Cancelar
-            </button>
-            <button className="primary" disabled={saving}>
-              {saving ? "Guardando..." : editing ? "Guardar cambios" : "Crear recurrencia"}
-            </button>
-          </div>
-        </form>
-      )}
 
-      {pendingDelete && (
-        <ConfirmDialog
-          title="Eliminar recurrencia"
-          description={`¿Eliminar "${pendingDelete.description}"? Los movimientos que ya se registraron se quedan como estan.`}
-          confirmLabel="Eliminar"
-          danger
-          onCancel={() => setPendingDelete(null)}
-          onConfirm={() => {
-            void remove(pendingDelete);
-            setPendingDelete(null);
-            setOpen(false);
-            setEditing(null);
-          }}
-        />
-      )}
+            <AnimatePresence initial={false}>
+              {open && (
+                <m.div key="recurrence-form" className="recurrence-form-wrap" {...collapseMotion}>
+                  <form className="recurrence-form" onSubmit={(event) => void submit(event)}>
+                    <OptionCards
+                      name="recurrence-type"
+                      legend="Que se repite"
+                      value={form.type}
+                      options={TYPE_OPTIONS.map((option) =>
+                        option.value === "CONTRIBUTION"
+                          ? { ...option, disabled: openGoals.length === 0 }
+                          : option
+                      )}
+                      onChange={(type) => {
+                        // Al pasar a aporte se elige la primera meta abierta, para que el
+                        // formulario nunca quede en un estado invalido.
+                        const goalId =
+                          type === "CONTRIBUTION" ? ((form.goalId || openGoals[0]?.id) ?? "") : "";
+                        const chosen = openGoals.find((item) => item.id === goalId);
+                        setForm({
+                          ...form,
+                          type,
+                          goalId,
+                          description: form.description || (chosen ? `Aporte a ${chosen.name}` : "")
+                        });
+                      }}
+                    />
+
+                    <div className="form-grid">
+                      <label className="form-grid-wide">
+                        <span className="field-label">Cada cuánto</span>
+                        {/* Tres opciones caben a la vista; en un desplegable habria que
+                            abrirlo solo para saber cuales son. */}
+                        <div className="chip-row">
+                          {recurrenceFrequencies.map((frequency) => (
+                            <button
+                              key={frequency}
+                              type="button"
+                              className={`period-chip${form.frequency === frequency ? " active" : ""}`}
+                              aria-pressed={form.frequency === frequency}
+                              onClick={() => setForm({ ...form, frequency })}
+                            >
+                              {FREQUENCY_LABELS[frequency]}
+                            </button>
+                          ))}
+                        </div>
+                      </label>
+                      <label className="form-grid-wide">
+                        Descripción
+                        <input
+                          required
+                          maxLength={160}
+                          value={form.description}
+                          onChange={(event) =>
+                            setForm({ ...form, description: event.target.value })
+                          }
+                          placeholder="Ej. Alquiler"
+                        />
+                      </label>
+                      <label>
+                        Monto
+                        <div className="compact-money">
+                          <span>RD$</span>
+                          <MoneyInput
+                            required
+                            value={form.amount}
+                            onChange={(amount) => setForm({ ...form, amount })}
+                          />
+                        </div>
+                      </label>
+                      <label>
+                        {isContribution ? "Meta" : "Categoría"}
+                        {isContribution ? (
+                          <select
+                            value={form.goalId}
+                            onChange={(event) => {
+                              const goalId = event.target.value;
+                              const chosen = openGoals.find((item) => item.id === goalId);
+                              setForm({
+                                ...form,
+                                goalId,
+                                // Se propone solo si el campo sigue vacio: nunca pisa lo
+                                // que la persona haya escrito.
+                                description:
+                                  form.description || (chosen ? `Aporte a ${chosen.name}` : "")
+                              });
+                            }}
+                          >
+                            {openGoals.map((item) => (
+                              <option key={item.id} value={item.id}>
+                                {item.name}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <select
+                            value={form.category}
+                            onChange={(event) => setForm({ ...form, category: event.target.value })}
+                          >
+                            {categories.map((category) => (
+                              <option key={category} value={category}>
+                                {category}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </label>
+                      <label>
+                        Primera vez
+                        <input
+                          required
+                          type="date"
+                          value={form.startDate}
+                          onChange={(event) => setForm({ ...form, startDate: event.target.value })}
+                        />
+                      </label>
+                      <label>
+                        <span className="field-label">
+                          Hasta <small>Opcional</small>
+                        </span>
+                        <input
+                          type="date"
+                          min={form.startDate}
+                          value={form.endDate}
+                          onChange={(event) => setForm({ ...form, endDate: event.target.value })}
+                        />
+                      </label>
+                    </div>
+                    {/* Solo lo mensual tiene el problema del dia 31; en lo semanal el
+              aviso seria ruido sobre algo que no puede pasar. */}
+                    {form.frequency === "MONTHLY" && (
+                      <p className="recurrence-hint">
+                        El día de la primera vez marca el resto de la serie. Si eliges un 31, los
+                        meses cortos usan su último día y luego vuelve al 31.
+                      </p>
+                    )}
+                    {error && <p role="alert">{error}</p>}
+                    <div className="dialog-actions recurrence-form-actions">
+                      {/* Eliminar vive aqui y no en la fila: es irreversible, y en la
+                lista quedaba pegado al de editar, a un dedo de distancia. */}
+                      {editing && (
+                        <button
+                          type="button"
+                          className="text-button danger-text recurrence-delete"
+                          onClick={() => setPendingDelete(editing)}
+                        >
+                          <Trash2 size={15} aria-hidden="true" /> Eliminar
+                        </button>
+                      )}
+                      <button type="button" className="secondary" onClick={() => setOpen(false)}>
+                        Cancelar
+                      </button>
+                      <button className="primary" disabled={saving}>
+                        {saving
+                          ? "Guardando..."
+                          : editing
+                            ? "Guardar cambios"
+                            : "Crear recurrencia"}
+                      </button>
+                    </div>
+                  </form>
+                </m.div>
+              )}
+            </AnimatePresence>
+          </m.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {pendingDelete && (
+          <ConfirmDialog
+            key="delete-recurrence"
+            title="Eliminar recurrencia"
+            description={`¿Eliminar "${pendingDelete.description}"? Los movimientos que ya se registraron se quedan como están.`}
+            confirmLabel="Eliminar"
+            danger
+            onCancel={() => setPendingDelete(null)}
+            onConfirm={() => {
+              void remove(pendingDelete);
+              setPendingDelete(null);
+              setOpen(false);
+              setEditing(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

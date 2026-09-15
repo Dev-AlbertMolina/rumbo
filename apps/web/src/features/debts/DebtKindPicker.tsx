@@ -13,7 +13,7 @@ const KIND_OPTIONS: Array<OptionCard<DebtKind>> = [
   {
     value: "DEBT",
     label: "Debo dinero",
-    hint: "Un prestamo o una tarjeta",
+    hint: "Un préstamo o una tarjeta",
     Icon: HandCoins,
     tone: "debt"
   },

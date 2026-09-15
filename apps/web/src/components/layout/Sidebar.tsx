@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { RouteLink } from "../../app/router";
+import { LATEST_RELEASE } from "../../features/whatsnew/releases";
 import { NAV_ITEMS } from "./nav-items";
 import { RumboLogo } from "./RumboLogo";
 import { UserMenu } from "./UserMenu";
@@ -21,7 +22,7 @@ export function Sidebar({
       <button className="primary add-button" onClick={onAdd}>
         <Plus size={18} /> Agregar
       </button>
-      <nav aria-label="Navegacion principal">
+      <nav aria-label="Navegación principal">
         {NAV_ITEMS.map(({ path, Icon, label }) => (
           <RouteLink
             key={path}
@@ -39,7 +40,7 @@ export function Sidebar({
       </nav>
       <div className="sidebar-foot">
         {user && <UserMenu user={user} onSignOut={onSignOut} className="sidebar-user-menu" />}
-        <small>v0.5</small>
+        <small>v{LATEST_RELEASE.version}</small>
       </div>
     </aside>
   );

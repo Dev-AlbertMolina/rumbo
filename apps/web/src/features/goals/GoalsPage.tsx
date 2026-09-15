@@ -150,7 +150,7 @@ export function GoalsPage({
           <header>
             <div>
               <p className="eyebrow">Nueva meta</p>
-              <h2>Que quieres alcanzar?</h2>
+              <h2>¿Qué quieres alcanzar?</h2>
             </div>
             <button type="button" className="close-button" onClick={() => setCreating(false)}>
               ×
@@ -202,8 +202,8 @@ export function GoalsPage({
       {goals.length === 0 ? (
         <IllustratedEmptyState
           eyebrow="Objetivos claros"
-          title="Aun no tienes metas"
-          description="Define una cantidad y una fecha para calcular tu avance y ver cuanto te falta."
+          title="Aún no tienes metas"
+          description="Define una cantidad y una fecha para calcular tu avance y ver cuánto te falta."
           action={
             <button className="primary" onClick={() => setCreating(true)}>
               <Plus size={18} /> Crear primera meta

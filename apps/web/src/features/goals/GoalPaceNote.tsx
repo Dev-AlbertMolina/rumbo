@@ -19,7 +19,7 @@ export function GoalPaceNote({ goal }: { goal: Goal }) {
       <p className="goal-pace overdue">
         <CalendarX size={16} aria-hidden="true" />
         <span>
-          La fecha ya paso y faltan <strong>{formatDop(pace.remainingCents)}</strong>. Ajusta la
+          La fecha ya pasó y faltan <strong>{formatDop(pace.remainingCents)}</strong>. Ajusta la
           fecha o el monto.
         </span>
       </p>
@@ -39,7 +39,7 @@ export function GoalPaceNote({ goal }: { goal: Goal }) {
       <span>
         Aparta <strong>{formatDop(pace.monthlyTargetCents!)}</strong> al mes durante{" "}
         {pace.monthsLeft} {meses}
-        {behind ? " para ponerte al dia." : " y llegas a tiempo."}
+        {behind ? " para ponerte al día." : " y llegas a tiempo."}
       </span>
     </p>
   );

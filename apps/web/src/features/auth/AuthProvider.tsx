@@ -92,8 +92,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
       <main className="auth-setup-error">
         <h1>Falta configurar Supabase</h1>
         <p>
-          La aplicacion se cerro de forma segura porque no encontro la configuracion de
-          autenticacion.
+          La aplicación se cerró de forma segura porque no encontró la configuración de
+          autenticación.
         </p>
       </main>
     );

@@ -48,7 +48,7 @@ export function SanProgress({ debt, progress }: { debt: Debt; progress: DebtProg
         <span>
           {lending ? (
             <>
-              Has puesto <strong>{formatDop(progress.netCents ?? 0)}</strong> y todavia no cobras.
+              Has puesto <strong>{formatDop(progress.netCents ?? 0)}</strong> y todavía no cobras.
             </>
           ) : (
             <>

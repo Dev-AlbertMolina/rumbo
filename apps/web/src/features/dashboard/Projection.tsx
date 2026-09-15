@@ -27,7 +27,7 @@ export function Projection({ summary, movements }: { summary: Summary; movements
       <p>
         {changed
           ? "Disponible proyectado al incluir movimientos programados."
-          : "Agrega movimientos programados para anticipar como cerrara el periodo."}
+          : "Agrega movimientos programados para anticipar cómo cerrará el periodo."}
       </p>
       {series.length >= 2 ? (
         <div className="projection-sparkline">
@@ -40,7 +40,7 @@ export function Projection({ summary, movements }: { summary: Summary; movements
         </div>
       )}
       <small>Registrado ahora</small>
-      <small>Proyeccion</small>
+      <small>Proyección</small>
     </section>
   );
 }

@@ -26,14 +26,14 @@ export function OfflineBanner({
           <strong>
             {online
               ? `${pending} ${pending === 1 ? "movimiento sin subir" : "movimientos sin subir"}`
-              : "Estas sin conexion"}
+              : "Estás sin conexión"}
           </strong>
           <p>
             {online
-              ? "Se subiran solos, o puedes intentarlo ahora."
+              ? "Se subirán solos, o puedes intentarlo ahora."
               : pending > 0
-                ? `Lo que registres se guarda en el telefono. Hay ${pending} esperando a subir.`
-                : "Puedes seguir registrando gastos: se subiran cuando vuelva la señal."}
+                ? `Lo que registres se guarda en el teléfono. Hay ${pending} esperando a subir.`
+                : "Puedes seguir registrando gastos: se subirán cuando vuelva la señal."}
           </p>
         </div>
       </div>

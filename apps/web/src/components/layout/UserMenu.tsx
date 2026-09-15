@@ -1,7 +1,9 @@
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import { ChevronDown, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { navigate } from "../../app/router";
 import { getUserInitial, getUserName } from "../../lib/format";
+import { DURATION, EASE_OUT } from "../../lib/motion";
 
 function LogoutIcon() {
   return (
@@ -53,6 +55,8 @@ export function UserMenu({
   const menuRef = useRef<HTMLDivElement>(null);
   const userName = getUserName(user);
   const initial = getUserInitial(userName);
+  const reduceMotion = useReducedMotion();
+  const hidden = reduceMotion ? "scale(1)" : "scale(0.97)";
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -85,52 +89,69 @@ export function UserMenu({
         />
       </button>
 
-      {open && (
-        <div className="user-dropdown-card" role="menu">
-          <div className="dropdown-user-header">
-            <div className="dropdown-avatar">{initial}</div>
-            <div className="dropdown-user-info">
-              <strong>{userName}</strong>
-              <small>{user.email || "Usuario"}</small>
+      <AnimatePresence>
+        {open && (
+          // Crece desde la esquina del boton que lo abre (transform-origin en el
+          // CSS): arriba a la derecha en la barra superior, abajo a la izquierda
+          // en la lateral, donde se abre hacia arriba.
+          <m.div
+            key="user-dropdown"
+            className="user-dropdown-card"
+            role="menu"
+            initial={{ opacity: 0, transform: hidden }}
+            animate={{ opacity: 1, transform: "scale(1)" }}
+            exit={{
+              opacity: 0,
+              transform: hidden,
+              transition: { duration: 0.12, ease: EASE_OUT }
+            }}
+            transition={{ duration: DURATION.fast, ease: EASE_OUT }}
+          >
+            <div className="dropdown-user-header">
+              <div className="dropdown-avatar">{initial}</div>
+              <div className="dropdown-user-info">
+                <strong>{userName}</strong>
+                <small>{user.email || "Usuario"}</small>
+              </div>
             </div>
-          </div>
-          <div className="dropdown-divider" />
-          <button
-            className="dropdown-action-btn"
-            onClick={() => {
-              setOpen(false);
-              navigate("/novedades");
-            }}
-            role="menuitem"
-          >
-            <Sparkles size={16} />
-            <span>Novedades</span>
-          </button>
-          <button
-            className="dropdown-action-btn"
-            onClick={() => {
-              setOpen(false);
-              navigate("/configuracion");
-            }}
-            role="menuitem"
-          >
-            <SettingsIcon />
-            <span>Configuración</span>
-          </button>
-          <button
-            className="dropdown-logout-btn"
-            onClick={() => {
-              setOpen(false);
-              void onSignOut();
-            }}
-            role="menuitem"
-            aria-label="Cerrar sesion"
-          >
-            <LogoutIcon />
-            <span>Cerrar sesión</span>
-          </button>
-        </div>
-      )}
+            <div className="dropdown-divider" />
+            <button
+              className="dropdown-action-btn"
+              onClick={() => {
+                setOpen(false);
+                navigate("/novedades");
+              }}
+              role="menuitem"
+            >
+              <Sparkles size={16} />
+              <span>Novedades</span>
+            </button>
+            <button
+              className="dropdown-action-btn"
+              onClick={() => {
+                setOpen(false);
+                navigate("/configuracion");
+              }}
+              role="menuitem"
+            >
+              <SettingsIcon />
+              <span>Configuración</span>
+            </button>
+            <button
+              className="dropdown-logout-btn"
+              onClick={() => {
+                setOpen(false);
+                void onSignOut();
+              }}
+              role="menuitem"
+              aria-label="Cerrar sesión"
+            >
+              <LogoutIcon />
+              <span>Cerrar sesión</span>
+            </button>
+          </m.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

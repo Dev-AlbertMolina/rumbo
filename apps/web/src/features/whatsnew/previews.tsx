@@ -9,6 +9,7 @@ import {
   type RecurringMovement
 } from "@ahorra/domain";
 import { OfflineBanner } from "../../components/OfflineBanner";
+import { ToastCard } from "../../components/Toaster";
 import { DebtKindPicker } from "../debts/DebtKindPicker";
 import { DebtsPage } from "../debts/DebtsPage";
 import { MovementCardList } from "../movements/MovementCardList";
@@ -139,7 +140,7 @@ const san: Debt = {
   kind: "SAN",
   status: "ACTIVE",
   name: "San del trabajo",
-  counterparty: "Maria",
+  counterparty: "María",
   principalCents: 0,
   installmentCents: 5_000_00,
   members: 10,
@@ -216,7 +217,7 @@ const sampleDebts: Debt[] = [
     spaceId: SPACE,
     kind: "DEBT",
     status: "ACTIVE",
-    name: "Tarjeta de credito",
+    name: "Tarjeta de crédito",
     counterparty: "Banco Popular",
     principalCents: 45_000_00,
     installmentCents: 0,
@@ -232,7 +233,7 @@ const sampleDebts: Debt[] = [
     spaceId: SPACE,
     kind: "LOAN",
     status: "ACTIVE",
-    name: "Prestamo a Juan",
+    name: "Préstamo a Juan",
     counterparty: "Juan",
     principalCents: 15_000_00,
     installmentCents: 0,
@@ -314,5 +315,15 @@ export function ReminderPreview() {
       onChange={noop}
       initialPermission="granted"
     />
+  );
+}
+
+/** Dos avisos seguidos, como se apilan al guardar con y sin conexion. */
+export function ToastPreview() {
+  return (
+    <div style={{ display: "grid", gap: 8, justifyItems: "start" }}>
+      <ToastCard message="Gasto guardado" tone="success" />
+      <ToastCard message="Guardado sin conexión: se sube solo cuando vuelva la señal" tone="info" />
+    </div>
   );
 }

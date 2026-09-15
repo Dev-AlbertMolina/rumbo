@@ -5,12 +5,14 @@ import {
   type Debt,
   type DebtKind
 } from "@ahorra/domain";
+import { AnimatePresence } from "framer-motion";
 import { Plus, Trash2 } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { IllustratedEmptyState } from "../../components/IllustratedEmptyState";
 import { MoneyInput } from "../../components/MoneyInput";
 import { PageTitle } from "../../components/PageTitle";
+import { toast } from "../../components/Toaster";
 import { apiFetch } from "../../lib/api";
 import { today } from "../../lib/format";
 import { DebtKindPicker, KIND_ICONS } from "./DebtKindPicker";
@@ -78,11 +80,12 @@ export function DebtsPage({
     });
     setSaving(false);
     if (!response.ok) {
-      setError("Revisa los datos. En un san hacen falta la cuota, cuantos son y tu turno.");
+      setError("Revisa los datos. En un san hacen falta la cuota, cuántos son y tu turno.");
       return;
     }
     setCreating(false);
     setForm(EMPTY);
+    toast("Compromiso creado");
     onSaved();
   }
 
@@ -97,16 +100,30 @@ export function DebtsPage({
       })
     });
     setSaving(false);
-    if (response.ok) {
-      setPayment("");
-      setPayingId(null);
-      onSaved();
+    if (!response.ok) {
+      toast("No pudimos registrarlo. Inténtalo de nuevo.", "error");
+      return;
     }
+    setPayment("");
+    setPayingId(null);
+    toast(
+      debt.kind === "LOAN"
+        ? "Cobro registrado"
+        : debt.kind === "SAN"
+          ? "Cuota registrada"
+          : "Pago registrado"
+    );
+    onSaved();
   }
 
   async function remove(debt: Debt) {
     const response = await apiFetch(accessToken, `/api/debts/${debt.id}`, { method: "DELETE" });
-    if (response.ok) onSaved();
+    if (!response.ok) {
+      toast("No pudimos eliminar el compromiso.", "error");
+      return;
+    }
+    toast("Compromiso eliminado");
+    onSaved();
   }
 
   return (
@@ -114,7 +131,7 @@ export function DebtsPage({
       <PageTitle
         eyebrow="Compromisos"
         title="Deudas y sanes"
-        description="Lo que debes, lo que te deben y en que punto va tu san."
+        description="Lo que debes, lo que te deben y en qué punto va tu san."
         action={
           <button className="primary" onClick={() => setCreating(true)}>
             <Plus size={18} /> Nuevo compromiso
@@ -127,7 +144,7 @@ export function DebtsPage({
           <header>
             <div>
               <p className="eyebrow">Nuevo compromiso</p>
-              <h2>Que quieres registrar?</h2>
+              <h2>¿Qué quieres registrar?</h2>
             </div>
             <button type="button" className="close-button" onClick={() => setCreating(false)}>
               ×
@@ -143,21 +160,21 @@ export function DebtsPage({
                 maxLength={120}
                 value={form.name}
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
-                placeholder={isSan ? "Ej. San del trabajo" : "Ej. Prestamo del banco"}
+                placeholder={isSan ? "Ej. San del trabajo" : "Ej. Préstamo del banco"}
               />
             </label>
             <label>
               {/* El texto y el 'Opcional' van juntos en un span: el label es una
                   rejilla y sueltos ocupaban una fila cada uno. */}
               <span className="field-label">
-                {isSan ? "Organiza" : form.kind === "DEBT" ? "A quien" : "Quien"}
+                {isSan ? "Organiza" : form.kind === "DEBT" ? "A quién" : "Quién"}
                 <small>Opcional</small>
               </span>
               <input
                 maxLength={120}
                 value={form.counterparty}
                 onChange={(event) => setForm({ ...form, counterparty: event.target.value })}
-                placeholder="Ej. Maria"
+                placeholder="Ej. María"
               />
             </label>
             {isSan ? (
@@ -174,7 +191,7 @@ export function DebtsPage({
                   </div>
                 </label>
                 <label>
-                  Cuantos son
+                  Cuántos son
                   <input
                     required
                     type="number"
@@ -211,7 +228,7 @@ export function DebtsPage({
             )}
             <label>
               <span className="field-label">
-                Fecha limite <small>Opcional</small>
+                Fecha límite <small>Opcional</small>
               </span>
               <input
                 type="date"
@@ -223,7 +240,7 @@ export function DebtsPage({
           {isSan && (
             <p className="recurrence-hint">
               En un san todos ponen la misma cuota cada ronda y por turnos uno se lleva todo lo
-              recaudado. Con la cuota, cuantos son y tu turno, Rumbo calcula cuanto cobras y cuando
+              recaudado. Con la cuota, cuántos son y tu turno, Rumbo calcula cuánto cobras y cuándo
               pasas de estar prestando a estar debiendo.
             </p>
           )}
@@ -245,7 +262,7 @@ export function DebtsPage({
         <IllustratedEmptyState
           eyebrow="Sin compromisos"
           title="No tienes deudas ni sanes registrados"
-          description="Anota lo que debes, lo que te deben o el san en el que estas para verlo junto al resto de tu plan."
+          description="Anota lo que debes, lo que te deben o el san en el que estás para verlo junto al resto de tu plan."
           action={
             <button className="primary" onClick={() => setCreating(true)}>
               <Plus size={18} /> Registrar el primero
@@ -375,19 +392,22 @@ export function DebtsPage({
         </div>
       )}
 
-      {pendingDelete && (
-        <ConfirmDialog
-          title="Eliminar compromiso"
-          description={`¿Eliminar "${pendingDelete.name}"? Los movimientos que ya registraste se quedan como estan.`}
-          confirmLabel="Eliminar"
-          danger
-          onCancel={() => setPendingDelete(null)}
-          onConfirm={() => {
-            void remove(pendingDelete);
-            setPendingDelete(null);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {pendingDelete && (
+          <ConfirmDialog
+            key="delete-debt"
+            title="Eliminar compromiso"
+            description={`¿Eliminar "${pendingDelete.name}"? Los movimientos que ya registraste se quedan como están.`}
+            confirmLabel="Eliminar"
+            danger
+            onCancel={() => setPendingDelete(null)}
+            onConfirm={() => {
+              void remove(pendingDelete);
+              setPendingDelete(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

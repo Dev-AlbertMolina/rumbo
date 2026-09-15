@@ -31,7 +31,7 @@ describe("apiFetch", () => {
   it("does not make financial requests without a session", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch");
 
-    await expect(apiFetch(null, "/api/spaces")).rejects.toThrow("Necesitas iniciar sesion");
+    await expect(apiFetch(null, "/api/spaces")).rejects.toThrow("Necesitas iniciar sesión");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

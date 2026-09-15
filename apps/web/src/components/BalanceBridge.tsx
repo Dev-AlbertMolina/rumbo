@@ -21,7 +21,7 @@ export function BalanceBridge({
       <div
         className="balance-bridge-bar"
         role="img"
-        aria-label="Distribucion del disponible antes de ahorro"
+        aria-label="Distribución del disponible antes de ahorro"
       >
         <span className="balance-bridge-after" style={{ width: `${afterPercent}%` }} />
         <span className="balance-bridge-savings" style={{ width: `${savingsPercent}%` }} />

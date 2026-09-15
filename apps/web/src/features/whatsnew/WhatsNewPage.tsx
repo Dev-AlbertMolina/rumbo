@@ -24,7 +24,7 @@ export function WhatsNewPage() {
       <PageTitle
         eyebrow="Historial"
         title="Novedades"
-        description="Lo que se agrego o cambio en cada version de Rumbo."
+        description="Lo que se agregó o cambió en cada versión de Rumbo."
       />
 
       <div className="release-list">
@@ -42,7 +42,7 @@ export function WhatsNewPage() {
                 </span>
                 <span className="release-heading">
                   <span className="release-meta">
-                    Version {release.version} · {formatDate(release.date)}
+                    Versión {release.version} · {formatDate(release.date)}
                   </span>
                   <strong>{release.title}</strong>
                   <span className="release-summary">{release.summary}</span>

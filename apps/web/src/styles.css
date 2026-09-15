@@ -4,7 +4,9 @@
   background: #fff8f0;
   font-synthesis: none;
   --paper: #fff8f0;
-  --surface: #ffffff;
+  /* Blanco apenas tenido hacia el crema del fondo: un blanco puro al lado del
+     papel se leia frio, como una pieza de otra app. */
+  --surface: #fffdfa;
   --muted-surface: #f3e8dd;
   --ink: #2b211e;
   --muted: #665851;
@@ -34,6 +36,14 @@
   /* Dorado de marca, el del punto del logo. Se usa para senalar el turno
      propio dentro de la rueda de un san. */
   --gold-accent: #e3a72f;
+  --gold-border: #ecd28a;
+  --info-border: #cfc6e6;
+  /* Texto sobre ciruela: el mismo crema del logo, no un blanco puro. */
+  --on-primary: #fff8f0;
+
+  /* Movimiento: la misma curva que usa Framer Motion (src/lib/motion.ts), de
+     salida fuerte, para que CSS y JS se muevan con el mismo ritmo. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
   /* Radius scale: small controls -> large surfaces -> full/pill.
      Signature tokens preserve the app's asymmetric "cut corner" motif
@@ -103,7 +113,7 @@ h2 {
   top: -60px;
   z-index: 100;
   background: var(--ink);
-  color: white;
+  color: var(--on-primary);
   padding: 12px 16px;
 }
 .skip-link:focus {
@@ -129,46 +139,28 @@ h2 {
   gap: 14px;
   margin: 0 4px 34px;
 }
+/* El logo entra una vez, breve y sin rebote. Antes rebotaba desde el 60%,
+   crecia y giraba al pasar el raton sin poder pulsarse, y "respiraba" en bucle
+   animando la sombra: movimiento que nadie mira, repintando sin parar.
+   Las entradas usan `backwards` y no `both`: al terminar no dejan nada
+   puesto, asi que no pisan el transform del :active ni de nadie. */
 .brand-logo-svg {
   flex-shrink: 0;
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 16px rgba(107, 41, 72, 0.32);
-  animation:
-    logoEntrance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-    logoBreath 4s ease-in-out 0.5s infinite;
-  cursor: default;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-.brand-logo-svg:hover {
-  transform: scale(1.08) rotate(-2deg);
-  box-shadow: 0 8px 28px rgba(107, 41, 72, 0.45);
+  animation: logoIn 0.3s var(--ease-out) backwards;
 }
 .brand-name {
   font-family: "Fraunces", Georgia, serif;
   font-size: var(--text-xl);
   color: var(--ink);
   letter-spacing: -0.3px;
-  animation: fadeInUp 0.6s ease both 0.15s;
+  animation: fadeInUp 0.3s var(--ease-out) backwards 0.05s;
 }
-@keyframes logoEntrance {
+@keyframes logoIn {
   from {
     opacity: 0;
-    transform: scale(0.6) rotate(-8deg);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-}
-@keyframes logoBreath {
-  0%,
-  100% {
-    box-shadow: 0 4px 16px rgba(107, 41, 72, 0.32);
-  }
-  50% {
-    box-shadow: 0 8px 28px rgba(107, 41, 72, 0.5);
+    transform: scale(0.95);
   }
 }
 @keyframes fadeInUp {
@@ -181,34 +173,10 @@ h2 {
     transform: translateY(0);
   }
 }
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
+    transform: translateX(-8px);
   }
 }
 @keyframes barGrow {
@@ -233,20 +201,10 @@ h2 {
 }
 .primary {
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   transition:
-    background 0.18s ease,
-    transform 0.12s ease,
-    box-shadow 0.18s ease;
-}
-.primary:hover {
-  background: var(--primary-active);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(107, 41, 72, 0.28);
-}
-.primary:active {
-  transform: translateY(0);
-  box-shadow: none;
+    background-color 0.18s ease,
+    transform 0.16s var(--ease-out);
 }
 .primary:disabled {
   opacity: 0.6;
@@ -256,6 +214,66 @@ h2 {
   background: transparent;
   color: var(--primary);
   border: 1px solid var(--border);
+  transition:
+    border-color 0.15s ease,
+    transform 0.16s var(--ease-out);
+}
+/* El hover solo donde hay raton de verdad. En una pantalla tactil se activa
+   al tocar y se queda puesto hasta tocar otra cosa, asi que un boton parecia
+   seguir resaltado cuando ya no pasaba nada. */
+@media (hover: hover) and (pointer: fine) {
+  .primary:hover {
+    background: var(--primary-active);
+  }
+  .secondary:hover {
+    border-color: var(--primary);
+  }
+}
+/* Respuesta al pulsar, compartida por todo lo que se puede tocar. Antes solo
+   el boton principal reaccionaba, y ni siquiera se hundia: en el telefono cada
+   toque dejaba la duda de si la app lo habia recibido. Las superficies grandes,
+   como las cabeceras plegables, quedan fuera: encogidas parecen desencajarse
+   en vez de responder. Con :where la lista no suma especificidad, y quien
+   declare su propio transition tiene que incluir transform. */
+:where(
+  .primary,
+  .secondary,
+  .period-chip,
+  .option-card,
+  .table-action,
+  .filters-toggle,
+  .close-button,
+  .text-button,
+  .floating-add,
+  .user-profile-button,
+  .dropdown-action-btn,
+  .dropdown-logout-btn,
+  .type-tabs button,
+  .bottom-nav a,
+  .sidebar nav a,
+  .auth-links button
+) {
+  transition: transform 0.16s var(--ease-out);
+}
+:where(
+    .primary,
+    .secondary,
+    .period-chip,
+    .option-card,
+    .table-action,
+    .filters-toggle,
+    .close-button,
+    .text-button,
+    .floating-add,
+    .user-profile-button,
+    .dropdown-action-btn,
+    .dropdown-logout-btn,
+    .type-tabs button,
+    .bottom-nav a,
+    .sidebar nav a,
+    .auth-links button
+  ):active:not(:disabled):not(.disabled) {
+  transform: scale(0.97);
 }
 .add-button {
   width: 100%;
@@ -275,10 +293,13 @@ h2 {
   gap: 13px;
   font-weight: 700;
   transition:
-    background 0.18s ease,
+    background-color 0.18s ease,
     color 0.18s ease,
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
+    transform 0.16s var(--ease-out);
+  /* Entrada escalonada, solo al abrir la app: la barra lateral no se vuelve a
+     montar al navegar. 200ms por enlace y 40ms entre uno y otro; antes el
+     ultimo tardaba 780ms en asentarse, y el sexto ni siquiera entraba. */
+  animation: slideInLeft 0.2s var(--ease-out) backwards;
 }
 .sidebar nav a span {
   width: 22px;
@@ -287,31 +308,33 @@ h2 {
   justify-content: center;
   flex-shrink: 0;
 }
-.sidebar nav a:hover {
-  background: var(--muted-surface);
-  color: var(--primary);
-  transform: translateX(3px);
+/* Sin desplazamiento al pasar el raton: el menu se recorre a menudo, y un
+   enlace que se mueve bajo el cursor distrae mas de lo que ayuda. */
+@media (hover: hover) and (pointer: fine) {
+  .sidebar nav a:hover {
+    background: var(--muted-surface);
+    color: var(--primary);
+  }
 }
 .sidebar nav a.active {
   background: var(--muted-surface);
   color: var(--primary);
   box-shadow: inset 3px 0 0 var(--primary);
 }
-/* Stagger sidebar items */
-.sidebar nav a:nth-child(1) {
-  animation: slideInLeft 0.4s ease both 0.1s;
-}
 .sidebar nav a:nth-child(2) {
-  animation: slideInLeft 0.4s ease both 0.17s;
+  animation-delay: 0.04s;
 }
 .sidebar nav a:nth-child(3) {
-  animation: slideInLeft 0.4s ease both 0.24s;
+  animation-delay: 0.08s;
 }
 .sidebar nav a:nth-child(4) {
-  animation: slideInLeft 0.4s ease both 0.31s;
+  animation-delay: 0.12s;
 }
 .sidebar nav a:nth-child(5) {
-  animation: slideInLeft 0.4s ease both 0.38s;
+  animation-delay: 0.16s;
+}
+.sidebar nav a:nth-child(6) {
+  animation-delay: 0.2s;
 }
 .sidebar-foot {
   margin-top: auto;
@@ -368,9 +391,11 @@ h2 {
   box-shadow: 0 1px 3px rgba(43, 33, 30, 0.03);
   transition: border-color 0.2s;
 }
-.topbar select:hover,
-.topbar input:hover {
-  border-color: var(--primary);
+@media (hover: hover) and (pointer: fine) {
+  .topbar select:hover,
+  .topbar input:hover {
+    border-color: var(--primary);
+  }
 }
 .topbar-brand {
   display: none;
@@ -386,8 +411,8 @@ h2 {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-signature-sm);
-  background: linear-gradient(135deg, var(--primary), var(--terracotta));
-  color: white;
+  background: var(--primary);
+  color: var(--on-primary);
   font-size: var(--text-lg);
   font-weight: bold;
 }
@@ -408,6 +433,7 @@ h2 {
   left: 0;
   top: auto;
   bottom: calc(100% + 8px);
+  transform-origin: bottom left;
 }
 /* In topbar (mobile only): hidden on desktop */
 .topbar-user-menu {
@@ -423,21 +449,30 @@ h2 {
   padding: 5px 12px 5px 6px;
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.16s var(--ease-out);
   box-shadow: 0 2px 6px rgba(43, 33, 30, 0.04);
 }
-.user-profile-button:hover,
 .user-profile-button.active {
   border-color: var(--primary);
   box-shadow: 0 4px 14px rgba(107, 41, 72, 0.12);
-  background: #fffcf8;
 }
+@media (hover: hover) and (pointer: fine) {
+  .user-profile-button:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 14px rgba(107, 41, 72, 0.12);
+  }
+}
+/* Color solido: el degradado de ciruela a terracota no decia nada y competia
+   con la marca justo donde aparece la inicial de la persona. */
 .user-avatar {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--terracotta) 100%);
-  color: white;
+  background: var(--primary);
+  color: var(--on-primary);
   display: grid;
   place-items: center;
   font-weight: 700;
@@ -467,7 +502,7 @@ h2 {
 }
 .chevron-icon {
   color: var(--muted);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s var(--ease-out);
   margin-left: 2px;
 }
 .chevron-icon.open {
@@ -484,7 +519,8 @@ h2 {
   padding: 14px;
   box-shadow: 0 12px 32px rgba(43, 33, 30, 0.14);
   z-index: 50;
-  animation: fadeInDown 0.15s ease-out;
+  /* Crece desde el boton que lo abre; lo anima UserMenu. */
+  transform-origin: top right;
 }
 .dropdown-user-header {
   display: flex;
@@ -496,8 +532,8 @@ h2 {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--terracotta) 100%);
-  color: white;
+  background: var(--primary);
+  color: var(--on-primary);
   display: grid;
   place-items: center;
   font-weight: 700;
@@ -542,12 +578,16 @@ h2 {
   font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    transform 0.16s var(--ease-out);
   border: 1px solid transparent;
   margin-bottom: 6px;
 }
-.dropdown-action-btn:hover {
-  background: #f3f0ec;
+@media (hover: hover) and (pointer: fine) {
+  .dropdown-action-btn:hover {
+    background: var(--muted-surface);
+  }
 }
 .dropdown-logout-btn {
   width: 100%;
@@ -562,21 +602,28 @@ h2 {
   font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.16s var(--ease-out);
 }
-.dropdown-logout-btn:hover {
-  background: #ffe3e9;
-  border-color: var(--danger-border-strong);
+@media (hover: hover) and (pointer: fine) {
+  .dropdown-logout-btn:hover {
+    background: #ffe3e9;
+    border-color: var(--danger-border-strong);
+  }
 }
-.fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
-}
+/* Solo un fundido corto al cambiar de seccion: navegar es lo que mas se
+   repite. Y sin transform: el `translateY(0)` que se quedaba puesto al acabar
+   convertia esta capa en el referente de todo lo `position: fixed` de dentro,
+   asi que el fondo de los dialogos de confirmacion cubria la pagina y no la
+   pantalla. */
 .page-transition {
-  animation: fadeIn 0.2s cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation: pageIn 0.16s var(--ease-out) backwards;
 }
-@media (prefers-reduced-motion: reduce) {
-  .page-transition {
-    animation: none;
+@keyframes pageIn {
+  from {
+    opacity: 0;
   }
 }
 @keyframes fadeIn {
@@ -595,8 +642,8 @@ h2 {
   padding: 12px 16px;
   background: var(--danger-bg);
   color: var(--danger);
-  border-left: 4px solid var(--danger);
-  border-radius: var(--radius-xs);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-md);
   font-size: var(--text-base);
   line-height: 1.4;
   animation: fadeIn 0.3s ease-out;
@@ -605,8 +652,8 @@ h2 {
   padding: 12px 16px;
   background: var(--success-bg);
   color: var(--success);
-  border-left: 4px solid var(--success);
-  border-radius: var(--radius-xs);
+  border: 1px solid var(--success-border);
+  border-radius: var(--radius-md);
   font-size: var(--text-base);
   line-height: 1.4;
   animation: fadeIn 0.3s ease-out;
@@ -643,7 +690,7 @@ h2 {
   position: relative;
   overflow: hidden;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border-radius: var(--radius-signature-lg);
   padding: clamp(26px, 4vw, 46px);
   display: grid;
@@ -786,14 +833,26 @@ h2 {
 .estimate-note p {
   font-size: var(--text-base);
 }
+/* Avisos: fondo tenido, borde fino e icono delante. La franja gruesa a la
+   izquierda que llevaban es el recurso mas repetido de los paneles genericos,
+   y el icono ya dice de que tipo es cada aviso. */
 .error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-top: 18px;
   padding: 14px 18px;
+  color: var(--danger);
   background: var(--danger-bg);
-  border-left: 4px solid var(--danger);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-md);
+}
+.error-banner > svg {
+  flex: none;
+}
+.error-banner > span {
+  flex: 1;
+  color: var(--ink);
 }
 .allocation-alert {
   display: flex;
@@ -804,7 +863,6 @@ h2 {
   padding: 18px 20px;
   background: var(--warning-bg);
   border: 1px solid var(--warning-border);
-  border-left: 5px solid var(--warning);
   border-radius: var(--radius-md);
 }
 .allocation-alert > div:first-child {
@@ -820,7 +878,7 @@ h2 {
   height: 26px;
   border-radius: 50%;
   background: var(--warning);
-  color: white;
+  color: var(--on-primary);
   font-weight: 700;
 }
 .allocation-alert p {
@@ -842,18 +900,15 @@ h2 {
   margin-top: 18px;
   padding: 18px 20px;
   border: 1px solid;
-  border-left-width: 5px;
   border-radius: var(--radius-md);
 }
 .budget-alert.near {
   background: var(--warning-bg);
   border-color: var(--warning-border);
-  border-left-color: var(--warning);
 }
 .budget-alert.over {
   background: var(--danger-bg);
   border-color: var(--danger-border);
-  border-left-color: var(--danger);
 }
 .budget-alert > div:first-child {
   display: flex;
@@ -867,7 +922,7 @@ h2 {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  color: white;
+  color: var(--on-primary);
 }
 .budget-alert.near > div:first-child > span {
   background: var(--warning);
@@ -1043,18 +1098,15 @@ h2 {
   margin-top: 18px;
   padding: 16px 20px;
   border: 1px solid;
-  border-left-width: 5px;
   border-radius: var(--radius-md);
 }
 .offline-banner.offline {
   background: var(--muted-surface);
   border-color: var(--border);
-  border-left-color: var(--muted);
 }
 .offline-banner.pending {
   background: var(--info-bg);
-  border-color: var(--info);
-  border-left-color: var(--info);
+  border-color: var(--info-border);
 }
 .offline-banner > div:first-child {
   display: flex;
@@ -1131,8 +1183,8 @@ h2 {
 
    El modulo se organiza por DIRECCION del dinero, que es lo unico que
    distingue de verdad los tres tipos: sale (deuda), entra (prestamo), o da
-   vueltas dentro del grupo (san). Cada uno tiene su color y lo lleva en el
-   borde izquierdo de la tarjeta, en la etiqueta y en la barra de avance.
+   vueltas dentro del grupo (san). Cada uno tiene su color y lo lleva en la
+   etiqueta, en la barra de avance y en el fondo de su cifra de resumen.
    Antes los tres compartian el mismo verde y la misma barra ciruela, asi que
    la pantalla no distinguia lo que debes de lo que te deben. */
 .debts-overview {
@@ -1146,7 +1198,6 @@ h2 {
   gap: 5px;
   padding: 14px 16px;
   border: 1px solid var(--border-soft);
-  border-left: 3px solid;
   border-radius: var(--radius-md);
   background: var(--surface);
 }
@@ -1163,19 +1214,22 @@ h2 {
   font-size: var(--text-sm);
 }
 .debts-overview-figure.debt {
-  border-left-color: var(--terracotta);
+  background: var(--terracotta-bg);
+  border-color: var(--terracotta-border);
 }
 .debts-overview-figure.debt .debts-overview-label {
   color: var(--terracotta);
 }
 .debts-overview-figure.loan {
-  border-left-color: var(--success);
+  background: var(--success-bg);
+  border-color: var(--success-border);
 }
 .debts-overview-figure.loan .debts-overview-label {
   color: var(--success);
 }
 .debts-overview-figure.san {
-  border-left-color: var(--gold-accent);
+  background: var(--gold-bg);
+  border-color: var(--gold-border);
 }
 .debts-overview-figure.san .debts-overview-label {
   color: var(--gold-ink);
@@ -1213,11 +1267,14 @@ h2 {
   background: var(--surface);
   cursor: pointer;
   transition:
-    border-color 0.15s cubic-bezier(0.23, 1, 0.32, 1),
-    background-color 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+    border-color 0.15s var(--ease-out),
+    background-color 0.15s var(--ease-out),
+    transform 0.16s var(--ease-out);
 }
-.option-card:hover {
-  border-color: var(--muted);
+@media (hover: hover) and (pointer: fine) {
+  .option-card:hover {
+    border-color: var(--muted);
+  }
 }
 /* El radio real sigue ahi, invisible pero enfocable: el teclado y los lectores
    de pantalla no deberian pagar el precio de un control bonito. */
@@ -1324,21 +1381,10 @@ h2 {
   gap: 20px;
   margin-top: 20px;
 }
-.debt-card {
-  border-left: 3px solid var(--border);
-}
-.debt-card.debt {
-  border-left-color: var(--terracotta);
-}
-.debt-card.loan {
-  border-left-color: var(--success);
-}
-.debt-card.san {
-  border-left-color: var(--gold-accent);
-}
-/* Lo saldado se retira sin desaparecer: sigue consultable, deja de competir. */
+/* El tipo lo dicen la etiqueta y la barra, que ya llevan su color. La franja
+   gruesa a la izquierda repetia lo mismo con el recurso mas generico de todos.
+   Lo saldado se retira sin desaparecer: sigue consultable, deja de competir. */
 .debt-card.settled {
-  border-left-color: var(--border);
   background: var(--muted-surface);
 }
 .debt-card.settled h2,
@@ -1652,19 +1698,25 @@ h2 {
     transition: none;
   }
 }
-/* El resto de hijos del panel de recurrencias tampoco traia relleno: la lista
-   sirve para que sus separadores lleguen de lado a lado. */
-.recurrences-panel > .recurrences-empty,
-.recurrences-panel > .recurrence-list,
-.recurrences-panel > .recurrence-form,
-.recurrences-panel > .option-cards {
+/* Lo de debajo de la cabecera va en un bloque que se abre y cierra animando su
+   alto, y el formulario en otro dentro de ese (los anima RecurrencesPanel).
+   Con overflow hidden el contenido no asoma mientras crecen.
+   Esos hijos tampoco traian relleno de por si: la lista lo recibe aqui para
+   que sus separadores lleguen de lado a lado. */
+.recurrences-body,
+.recurrence-form-wrap {
+  overflow: hidden;
+}
+.recurrences-body > .recurrences-empty,
+.recurrences-body > .recurrence-list,
+.recurrence-form-wrap > .recurrence-form {
   padding-left: 22px;
   padding-right: 22px;
 }
-.recurrences-panel > .recurrences-empty {
+.recurrences-body > .recurrences-empty {
   padding-bottom: 22px;
 }
-.recurrences-panel > .recurrence-form {
+.recurrence-form-wrap > .recurrence-form {
   padding-bottom: 22px;
 }
 .recurrences-empty {
@@ -1795,18 +1847,15 @@ h2 {
   grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr);
   gap: 20px;
 }
+/* Sin animacion de entrada ni sombra al pasar el raton. La entrada se repetia
+   en cada panel cada vez que se cambiaba de seccion, 400ms en lo mas visto de
+   la app; y la sombra prometia que el panel se podia pulsar sin que hiciera
+   nada. */
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-signature);
   padding: 24px;
-  animation: scaleIn 0.4s ease both;
-  transition:
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
-}
-.panel:hover {
-  box-shadow: 0 6px 24px rgba(43, 33, 30, 0.07);
 }
 .panel > header {
   display: flex;
@@ -1885,7 +1934,7 @@ h2 {
   width: 100%;
   border-radius: 8px 8px 0 0;
   min-height: 2px;
-  transition: height 0.35s ease;
+  transition: height 0.35s var(--ease-out);
 }
 .bar-0 {
   background: var(--primary);
@@ -2100,7 +2149,6 @@ h2 {
   border-radius: var(--radius-signature);
   box-shadow: 0 20px 50px rgba(43, 33, 30, 0.22);
   text-align: center;
-  animation: scaleIn 0.18s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 .confirm-dialog-icon {
   display: grid;
@@ -2127,8 +2175,10 @@ h2 {
 .confirm-danger {
   background: var(--danger);
 }
-.confirm-danger:hover {
-  background: var(--danger-active);
+@media (hover: hover) and (pointer: fine) {
+  .confirm-danger:hover {
+    background: var(--danger-active);
+  }
 }
 .whats-new-dialog {
   width: min(440px, 100%);
@@ -2137,7 +2187,6 @@ h2 {
   border-radius: var(--radius-signature);
   box-shadow: 0 20px 50px rgba(43, 33, 30, 0.22);
   text-align: center;
-  animation: scaleIn 0.2s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 .whats-new-icon {
   display: grid;
@@ -2198,6 +2247,10 @@ h2 {
 .movement-dialog h2 {
   margin-bottom: 0;
   font-size: var(--text-2xl);
+}
+/* Asa de la hoja de movimiento; solo aparece en el telefono. */
+.sheet-grip {
+  display: none;
 }
 .close-button {
   border: 0;
@@ -2300,7 +2353,8 @@ h2 {
 }
 .impact-card {
   padding: 15px;
-  border-left: 4px solid var(--info);
+  border: 1px solid var(--info-border);
+  border-radius: var(--radius-md);
   background: var(--info-bg);
   display: flex;
   justify-content: space-between;
@@ -2368,9 +2422,11 @@ h2 {
   padding: 9px 12px;
   border-radius: var(--radius-md);
 }
-:is(.panel form, form.panel, .filters-row)
-  :is(input:not([type="radio"]):not([type="checkbox"]), select, textarea):hover {
-  border-color: var(--muted);
+@media (hover: hover) and (pointer: fine) {
+  :is(.panel form, form.panel, .filters-row)
+    :is(input:not([type="radio"]):not([type="checkbox"]), select, textarea):hover {
+    border-color: var(--muted);
+  }
 }
 /* El desplegable trae su propia flecha, distinta en cada sistema. Se apaga y
    se dibuja la misma en todos. */
@@ -2410,15 +2466,21 @@ h2 {
   font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.16s var(--ease-out);
 }
-.period-chip:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+@media (hover: hover) and (pointer: fine) {
+  .period-chip:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
 }
 .period-chip.active {
   background: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
   border-color: var(--primary);
 }
 .period-range-inputs {
@@ -2466,8 +2528,10 @@ h2 {
   color: var(--ink);
   font-weight: 700;
 }
-.filters-toggle:hover {
-  border-color: var(--muted);
+@media (hover: hover) and (pointer: fine) {
+  .filters-toggle:hover {
+    border-color: var(--muted);
+  }
 }
 .filters-count {
   display: grid;
@@ -2543,7 +2607,7 @@ h2 {
 .data-table th {
   color: var(--muted);
   font-size: var(--text-sm);
-  background: #fffdfa;
+  background: var(--paper);
 }
 .data-table tr:last-child td {
   border-bottom: 0;
@@ -2565,10 +2629,14 @@ h2 {
   font-weight: 700;
   padding: 8px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    transform 0.16s var(--ease-out);
 }
-.table-action:hover {
-  background: var(--muted-surface);
+@media (hover: hover) and (pointer: fine) {
+  .table-action:hover {
+    background: var(--muted-surface);
+  }
 }
 .table-action.danger {
   color: var(--danger);
@@ -2579,7 +2647,7 @@ h2 {
   align-items: center;
   gap: 20px;
   padding: 17px 20px;
-  background: #fffdfa;
+  background: var(--paper);
   border-top: 1px solid var(--border);
 }
 .pagination p {
@@ -2649,7 +2717,7 @@ h2 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border-radius: var(--radius-lg);
   margin-bottom: 20px;
   overflow: hidden;
@@ -2697,25 +2765,51 @@ h2 {
   color: var(--danger);
   margin: 0;
 }
-.save-message {
-  padding: 12px 15px;
-  border-left: 4px solid var(--success);
-  background: var(--success-bg);
-  animation: messageFadeOut 4s ease forwards;
+/* Avisos flotantes (Toaster). Oscuros sobre el crema para leerse de un
+   vistazo, y siempre en el mismo sitio: antes cada pantalla ponia su mensaje
+   dentro de la pagina y, si habias bajado, no se veia. */
+.toaster {
+  position: fixed;
+  z-index: 60;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  width: min(380px, calc(100% - 32px));
+  pointer-events: none;
 }
-@keyframes messageFadeOut {
-  0%,
-  75% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+.toast-slot {
+  max-width: 100%;
+  pointer-events: auto;
 }
-@media (prefers-reduced-motion: reduce) {
-  .save-message {
-    animation: none;
-  }
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-radius: var(--radius-signature);
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 12px 32px rgba(43, 33, 30, 0.24);
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+.toast > svg {
+  flex: none;
+}
+.toast.success > svg {
+  color: #8fd0b1;
+}
+.toast.error > svg {
+  color: #f4a3b1;
+}
+.toast.info > svg {
+  color: var(--accent);
 }
 .budget-editor > header {
   padding: 22px;
@@ -2837,8 +2931,10 @@ h2 {
   padding: 9px 12px 9px 47px !important;
   font-variant-numeric: tabular-nums;
 }
-.compact-money input:hover {
-  border-color: var(--muted);
+@media (hover: hover) and (pointer: fine) {
+  .compact-money input:hover {
+    border-color: var(--muted);
+  }
 }
 .inline-form {
   margin-bottom: 22px;
@@ -2885,7 +2981,7 @@ h2 {
   justify-content: center;
   gap: 10px;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border-radius: var(--radius-signature);
   animation:
     goalCelebrationIn 0.3s cubic-bezier(0.23, 1, 0.32, 1) both,
@@ -3383,9 +3479,17 @@ h2 {
     border-radius: var(--radius-signature-lg);
     border: 0;
     background: var(--primary);
-    color: white;
+    color: var(--on-primary);
     font-size: var(--text-2xl);
     box-shadow: 0 9px 24px rgba(81, 32, 55, 0.3);
+  }
+  /* Encima del boton flotante, que ocupa la esquina de abajo. */
+  .toaster {
+    left: 16px;
+    right: 16px;
+    bottom: 152px;
+    width: auto;
+    align-items: stretch;
   }
 }
 
@@ -3604,25 +3708,60 @@ h2 {
   .report-kpis strong {
     font-size: var(--text-lg);
   }
+  /* En el telefono el panel es una hoja a pantalla completa que sube desde
+     abajo (ver MovementDialog). La cabecera se queda arriba al hacer scroll y
+     es el asa para cerrarla arrastrando hacia abajo. */
   .movement-dialog {
-    padding: 24px 20px 108px;
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px;
+  }
+  .movement-dialog > header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    flex-wrap: wrap;
+    margin: 0 -20px;
+    padding: 8px 20px 16px;
+    background: var(--paper);
+    touch-action: none;
+  }
+  .sheet-grip {
+    display: flex;
+    flex-basis: 100%;
+    justify-content: center;
+    padding-bottom: 10px;
+  }
+  .sheet-grip span {
+    width: 36px;
+    height: 4px;
+    border-radius: var(--radius-full);
+    background: var(--border);
   }
   .movement-dialog form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
     gap: 22px;
   }
   .form-row {
     grid-template-columns: 1fr;
     gap: 18px;
   }
-  /* La barra fija al pie es solo para el panel de movimientos, que en movil
-     ocupa la pantalla entera. Aplicada a todo .dialog-actions se llevaba
-     tambien los botones del dialogo de confirmacion y los de los formularios
-     que viven dentro de la pagina, sacandolos de su tarjeta: en el de
-     confirmacion acababan encima del propio titulo. */
+  /* La barra al pie es solo para el panel de movimientos, que en movil ocupa
+     la pantalla entera. Aplicada a todo .dialog-actions se llevaba tambien los
+     botones del dialogo de confirmacion y los de los formularios que viven
+     dentro de la pagina, sacandolos de su tarjeta: en el de confirmacion
+     acababan encima del propio titulo.
+     Pegada con sticky y no con fixed: la hoja entra con transform, y lo fixed
+     dentro de algo con transform se coloca respecto a ese algo, no respecto a
+     la pantalla. margin-top auto la baja al pie aunque el formulario sea
+     corto. */
   .movement-dialog .dialog-actions {
-    position: fixed;
-    inset: auto 0 0;
-    padding: 12px 18px max(12px, env(safe-area-inset-bottom));
+    position: sticky;
+    bottom: 0;
+    margin: auto -20px 0;
+    padding: 12px 20px max(12px, env(safe-area-inset-bottom));
     background: var(--surface);
     border-top: 1px solid var(--border);
   }
@@ -3631,11 +3770,23 @@ h2 {
   }
 }
 
+/* Con "reducir movimiento" activo no se mueve nada. Antes este bloque solo
+   apagaba las transiciones, y paneles, logo y menu seguian animandose. Ahora
+   las animaciones terminan al instante en su estado final. El indicador de
+   carga es la excepcion: quieto parece que la app se colgo. Framer Motion lo
+   respeta por su lado (MotionProvider). */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     scroll-behavior: auto !important;
     transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+  }
+  .spin {
+    animation-duration: 2.4s !important;
+    animation-iteration-count: infinite !important;
   }
 }

@@ -15,7 +15,7 @@ export function RecentMovements({
       <header>
         <div>
           <p className="eyebrow">Actividad reciente</p>
-          <h2>Tus ultimos movimientos</h2>
+          <h2>Tus últimos movimientos</h2>
         </div>
         <button className="text-button" onClick={onViewAll}>
           Ver todos

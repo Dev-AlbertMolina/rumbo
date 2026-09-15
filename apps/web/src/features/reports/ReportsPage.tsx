@@ -57,7 +57,7 @@ export function ReportsPage({
   return (
     <>
       <PageTitle
-        eyebrow="Analisis"
+        eyebrow="Análisis"
         title="Reportes"
         description={`Resumen financiero de ${monthLabel(month)}.`}
         action={
@@ -107,8 +107,8 @@ export function ReportsPage({
               <thead>
                 <tr>
                   <th>Fecha</th>
-                  <th>Descripcion</th>
-                  <th>Categoria</th>
+                  <th>Descripción</th>
+                  <th>Categoría</th>
                   <th className="number">Monto</th>
                 </tr>
               </thead>

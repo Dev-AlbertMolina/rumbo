@@ -48,7 +48,7 @@ describe("BudgetAlertBanner", () => {
       />
     );
 
-    expect(screen.getByText(/Estas cerca del limite en 1 categoria/)).toBeInTheDocument();
+    expect(screen.getByText(/Estás cerca del límite en 1 categoría/)).toBeInTheDocument();
     expect(screen.getByText("Alimentacion")).toBeInTheDocument();
     expect(screen.getByText(/quedan RD\$1,500/)).toBeInTheDocument();
   });
@@ -61,7 +61,7 @@ describe("BudgetAlertBanner", () => {
       />
     );
 
-    expect(screen.getByText(/Te pasaste del limite en 1 categoria/)).toBeInTheDocument();
+    expect(screen.getByText(/Te pasaste del límite en 1 categoría/)).toBeInTheDocument();
     expect(screen.getByText(/excedida por RD\$1,200/)).toBeInTheDocument();
   });
 
@@ -73,7 +73,7 @@ describe("BudgetAlertBanner", () => {
       />
     );
 
-    expect(screen.getByText(/Te pasaste del limite en 1 categoria/)).toBeInTheDocument();
+    expect(screen.getByText(/Te pasaste del límite en 1 categoría/)).toBeInTheDocument();
     expect(screen.getAllByRole("listitem")[0]).toHaveTextContent("Transporte");
   });
 
@@ -96,7 +96,7 @@ describe("BudgetAlertBanner", () => {
     );
 
     expect(screen.getAllByRole("listitem")).toHaveLength(4);
-    expect(screen.getByText("y 1 mas")).toBeInTheDocument();
+    expect(screen.getByText("y 1 más")).toBeInTheDocument();
   });
 
   it("ignores categories left without a limit, however much they were spent", () => {

@@ -111,7 +111,7 @@ export const createDebtSchema = z
         });
       }
       if (value.members === null) {
-        context.addIssue({ code: "custom", path: ["members"], message: "Indica cuantos son." });
+        context.addIssue({ code: "custom", path: ["members"], message: "Indica cuántos son." });
       }
       if (value.turnPosition === null) {
         context.addIssue({ code: "custom", path: ["turnPosition"], message: "Indica tu turno." });
@@ -124,7 +124,7 @@ export const createDebtSchema = z
         context.addIssue({
           code: "custom",
           path: ["turnPosition"],
-          message: "El turno no puede pasar del numero de miembros."
+          message: "El turno no puede pasar del número de miembros."
         });
       }
       return;

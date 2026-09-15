@@ -14,7 +14,7 @@ export function CategoryChart({ summary }: { summary: Summary }) {
         </div>
       </header>
       {summary.expenseByCategory.length === 0 ? (
-        <p className="muted">Registra un gasto para ver tus categorias.</p>
+        <p className="muted">Registra un gasto para ver tus categorías.</p>
       ) : (
         <div className="category-list">
           {top.map((item) => (

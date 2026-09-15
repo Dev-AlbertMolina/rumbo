@@ -16,7 +16,7 @@ export function monthLabel(month: string): string {
 }
 
 export async function readJson<T>(response: Response): Promise<T> {
-  if (!response.ok) throw new Error("No pudimos cargar la informacion.");
+  if (!response.ok) throw new Error("No pudimos cargar la información.");
   return response.json() as Promise<T>;
 }
 

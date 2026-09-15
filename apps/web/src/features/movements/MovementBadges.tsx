@@ -21,7 +21,7 @@ export function MovementBadges({
       key: "pending",
       Icon: CloudOff,
       label: "Sin subir",
-      title: "Aun no se ha subido",
+      title: "Aún no se ha subido",
       className: "pending"
     },
     movement.receiptPath && {

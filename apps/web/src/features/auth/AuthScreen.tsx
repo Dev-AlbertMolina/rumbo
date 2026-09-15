@@ -28,7 +28,7 @@ export function AuthScreen() {
         });
         if (recoveryError) throw recoveryError;
         setMessage(
-          "Si existe una cuenta con ese correo, recibiras instrucciones para recuperar el acceso."
+          "Si existe una cuenta con ese correo, recibirás instrucciones para recuperar el acceso."
         );
         return;
       }
@@ -60,7 +60,7 @@ export function AuthScreen() {
       // cosa: comprobarlo es mas corto que fingir que siempre es un Error.
       const message = err instanceof Error ? err.message : "";
       setError(
-        message || "No pudimos completar la solicitud. Revisa los datos e intentalo de nuevo."
+        message || "No pudimos completar la solicitud. Revisa los datos e inténtalo de nuevo."
       );
     } finally {
       setLoading(false);
@@ -89,10 +89,7 @@ export function AuthScreen() {
             viewBox="0 0 512 512"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
-            style={{
-              boxShadow: "none",
-              animation: "logoEntrance 0.5s cubic-bezier(.34,1.56,.64,1) both"
-            }}
+            style={{ boxShadow: "none" }}
           >
             <path
               d="M126 354V158h92c63 0 105 31 105 87 0 35-17 61-48 75l90 34h-94l-66-29v29h-79zm79-97h19c24 0 37-9 37-28s-13-27-37-27h-19v55z"
@@ -100,20 +97,18 @@ export function AuthScreen() {
             />
             <circle cx="365" cy="152" r="42" fill="#E3A72F" />
           </svg>
-          <strong className="brand-name" style={{ fontSize: "32px" }}>
-            Rumbo
-          </strong>
+          <strong className="brand-name">Rumbo</strong>
         </div>
-        <p className="eyebrow">Planificacion clara</p>
+        <p className="eyebrow">Planificación clara</p>
         <h1>Organiza lo que entra, lo que sale y lo que quieres alcanzar.</h1>
         <p>Tus espacios Personal y Negocio permanecen separados y bajo tu control.</p>
         <div className="auth-promise">
           <span>01</span>
           <p>Registra manualmente incluso sin internet.</p>
           <span>02</span>
-          <p>Sincroniza automaticamente al reconectarte.</p>
+          <p>Sincroniza automáticamente al reconectarte.</p>
           <span>03</span>
-          <p>Revisa cada calculo y supuesto.</p>
+          <p>Revisa cada cálculo y supuesto.</p>
         </div>
       </section>
       <section className="auth-card">
@@ -145,7 +140,7 @@ export function AuthScreen() {
             </label>
           )}
           <label>
-            Correo electronico
+            Correo electrónico
             <input
               type="email"
               autoComplete="email"
@@ -203,7 +198,9 @@ export function AuthScreen() {
                   )}
                 </button>
               </div>
-              <small>Minimo 8 caracteres.</small>
+              {/* La regla solo sirve a quien elige la contraseña, no a quien
+                  ya la tiene y viene a entrar. */}
+              {mode === "SIGN_UP" && <small>Mínimo 8 caracteres.</small>}
             </label>
           )}
           {error && (
@@ -220,7 +217,7 @@ export function AuthScreen() {
             {loading
               ? "Procesando..."
               : mode === "SIGN_IN"
-                ? "Iniciar sesion"
+                ? "Iniciar sesión"
                 : mode === "SIGN_UP"
                   ? "Crear cuenta"
                   : "Enviar instrucciones"}
@@ -229,16 +226,16 @@ export function AuthScreen() {
         <div className="auth-links">
           {mode === "SIGN_IN" && (
             <>
-              <button onClick={() => changeMode("RECOVERY")}>Olvide mi contraseña</button>
+              <button onClick={() => changeMode("RECOVERY")}>Olvidé mi contraseña</button>
               <button onClick={() => changeMode("SIGN_UP")}>Crear una cuenta</button>
             </>
           )}
           {mode !== "SIGN_IN" && (
-            <button onClick={() => changeMode("SIGN_IN")}>Volver a iniciar sesion</button>
+            <button onClick={() => changeMode("SIGN_IN")}>Volver a iniciar sesión</button>
           )}
         </div>
         <p className="auth-privacy">
-          Al continuar aceptas los terminos y confirmas que leiste el aviso de privacidad.
+          Al continuar aceptas los términos y confirmas que leíste el aviso de privacidad.
         </p>
       </section>
     </main>

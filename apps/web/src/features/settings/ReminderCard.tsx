@@ -37,7 +37,7 @@ export function ReminderCard({
       <section className="panel settings-card">
         <p className="eyebrow">Recordatorios</p>
         <h2>
-          <BellOff size={20} /> No disponibles aqui
+          <BellOff size={20} /> No disponibles aquí
         </h2>
         <p className="settings-hint">
           Este navegador no permite notificaciones. En la app de Android si funcionan.
@@ -64,7 +64,7 @@ export function ReminderCard({
       {state === "denied" ? (
         <p className="settings-hint">
           Bloqueaste las notificaciones para Rumbo. Para reactivarlas hay que permitirlas desde los
-          ajustes del navegador o del telefono.
+          ajustes del navegador o del teléfono.
         </p>
       ) : (
         <>
@@ -102,8 +102,8 @@ export function ReminderCard({
           )}
 
           <p className="settings-hint">
-            El aviso lo lanza este aparato, no un servidor, asi que solo suena mientras Rumbo sigue
-            abierta. Para que avise con la app cerrada haria falta configurar notificaciones push.
+            El aviso lo lanza este aparato, no un servidor, así que solo suena mientras Rumbo sigue
+            abierta. Para que avise con la app cerrada haría falta configurar notificaciones push.
           </p>
         </>
       )}

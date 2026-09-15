@@ -113,9 +113,9 @@ export function MovementsPage({
 
       {movements.length === 0 ? (
         <IllustratedEmptyState
-          eyebrow="Aun no hay movimientos"
+          eyebrow="Aún no hay movimientos"
           title="Registra tu primer movimiento"
-          description="Anade un ingreso o un gasto para empezar a ver tu actividad aqui."
+          description="Añade un ingreso o un gasto para empezar a ver tu actividad aquí."
           action={
             <>
               <button className="primary" onClick={() => onAdd("INCOME")}>
@@ -135,7 +135,7 @@ export function MovementsPage({
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Descripcion o categoria"
+                placeholder="Descripción o categoría"
               />
             </label>
             {/*
@@ -237,8 +237,8 @@ export function MovementsPage({
                   <thead>
                     <tr>
                       <th>Fecha</th>
-                      <th>Descripcion</th>
-                      <th>Categoria</th>
+                      <th>Descripción</th>
+                      <th>Categoría</th>
                       <th>Tipo</th>
                       <th>Estado</th>
                       <th className="number">Monto</th>
@@ -308,7 +308,7 @@ export function MovementsPage({
                     Anterior
                   </button>
                   <span>
-                    Pagina <strong>{currentPage}</strong> de {totalPages}
+                    Página <strong>{currentPage}</strong> de {totalPages}
                   </span>
                   <button
                     className="secondary"

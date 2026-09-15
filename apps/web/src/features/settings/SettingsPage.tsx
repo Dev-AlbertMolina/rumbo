@@ -56,8 +56,8 @@ export function SettingsPage({
     <>
       <PageTitle
         eyebrow="Preferencias"
-        title="Configuracion"
-        description="Administra los espacios y ajustes generales de tu planificacion."
+        title="Configuración"
+        description="Administra los espacios y ajustes generales de tu planificación."
       />
       <div className="settings-grid">
         <section className="panel">
@@ -65,7 +65,7 @@ export function SettingsPage({
           <h2>Datos del usuario</h2>
           <div className="settings-definition settings-definition-block">
             <div>
-              <dt>Correo electronico</dt>
+              <dt>Correo electrónico</dt>
               <dd>{user?.email}</dd>
             </div>
             <div>
@@ -174,7 +174,7 @@ export function SettingsPage({
           <h2>
             <ShieldCheck size={22} /> Tus registros son manuales
           </h2>
-          <p>Rumbo no esta conectado a tus cuentas bancarias y no mueve dinero.</p>
+          <p>Rumbo no está conectado a tus cuentas bancarias y no mueve dinero.</p>
         </section>
       </div>
     </>
