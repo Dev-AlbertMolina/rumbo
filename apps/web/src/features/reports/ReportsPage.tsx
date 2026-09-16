@@ -3,6 +3,7 @@ import { Download, PiggyBank, Sprout, TrendingDown, TrendingUp } from "lucide-re
 import { PageTitle } from "../../components/PageTitle";
 import { CashFlowChart } from "../dashboard/CashFlowChart";
 import { CategoryChart } from "../dashboard/CategoryChart";
+import { CategoryChanges } from "./CategoryChanges";
 import { usePreviousMonthSummary } from "../../hooks/usePreviousMonthSummary";
 import { monthLabel } from "../../lib/format";
 
@@ -95,6 +96,7 @@ export function ReportsPage({
       <div className="reports-grid">
         <CashFlowChart summary={summary} previousSummary={previousSummary} />
         <CategoryChart summary={summary} />
+        <CategoryChanges summary={summary} previousSummary={previousSummary} month={month} />
         <section className="panel report-detail">
           <header>
             <div>

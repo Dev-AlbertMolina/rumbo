@@ -52,3 +52,38 @@ export function getUserInitial(name: string): string {
   if (!name) return "U";
   return name.charAt(0).toUpperCase();
 }
+
+/** El mes anterior a uno dado, en formato AAAA-MM. */
+export function previousMonth(month: string): string {
+  const [year, value] = month.split("-").map(Number);
+  const date = new Date(year!, value! - 2, 1);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+/** Solo el nombre del mes, en minusculas: "septiembre". */
+export function monthName(month: string): string {
+  const [year, value] = month.split("-").map(Number);
+  return new Intl.DateTimeFormat("es-DO", { month: "long" }).format(new Date(year!, value! - 1, 1));
+}
+
+export interface MonthElapsed {
+  day: number;
+  days: number;
+  /** Parte del mes que ya paso, de 0 a 1. */
+  ratio: number;
+  /** Solo el mes en curso tiene un "hoy" que marcar. */
+  current: boolean;
+}
+
+/** Cuanto del mes ya paso. Un mes cerrado vale 1 y uno que aun no empieza, 0. */
+export function monthElapsed(month: string): MonthElapsed {
+  const [year, value] = month.split("-").map(Number);
+  const days = new Date(year!, value!, 0).getDate();
+  const now = today();
+  if (now.slice(0, 7) !== month) {
+    const past = now.slice(0, 7) > month;
+    return { day: past ? days : 0, days, ratio: past ? 1 : 0, current: false };
+  }
+  const day = Number(now.slice(8, 10));
+  return { day, days, ratio: day / days, current: true };
+}

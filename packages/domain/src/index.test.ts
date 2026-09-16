@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   calculateBudgetAlerts,
   calculateGoalPace,
+  calculateMonthBalance,
   calculateSummary,
   dominicanDate,
   calculateBalance,
@@ -520,5 +521,77 @@ describe("createRecurringMovementSchemaChecked", () => {
     expect(
       createRecurringMovementSchemaChecked.safeParse({ ...base, type: "EXPENSE" }).success
     ).toBe(true);
+  });
+});
+
+describe("calculateMonthBalance", () => {
+  const on = (entry: Movement, effectiveDate: string): Movement => ({ ...entry, effectiveDate });
+
+  it("accumulates the month day by day and marks up to today as registered", () => {
+    const balance = calculateMonthBalance(
+      [
+        on(movement("1", "INCOME", "REGISTERED", 10_000_00), "2026-09-01"),
+        on(movement("2", "EXPENSE", "REGISTERED", 3_000_00), "2026-09-05"),
+        on(movement("3", "CONTRIBUTION", "REGISTERED", 1_000_00), "2026-09-05")
+      ],
+      "2026-09",
+      "2026-09-10"
+    );
+
+    expect(balance.points).toHaveLength(30);
+    expect(balance.points[0]).toEqual({ day: 1, cents: 10_000_00, registered: true });
+    expect(balance.points[4]!.cents).toBe(6_000_00);
+    expect(balance.points[9]!.registered).toBe(true);
+    expect(balance.points[10]!.registered).toBe(false);
+    expect(balance.lastRegisteredDay).toBe(10);
+    expect(balance.endCents).toBe(6_000_00);
+  });
+
+  it("adds scheduled money on its date, and overdue scheduled money from tomorrow", () => {
+    const balance = calculateMonthBalance(
+      [
+        on(movement("1", "INCOME", "REGISTERED", 2_000_00), "2026-09-01"),
+        on(movement("2", "EXPENSE", "SCHEDULED", 1_500_00), "2026-09-03"),
+        on(movement("3", "EXPENSE", "SCHEDULED", 1_000_00), "2026-09-12"),
+        on(movement("4", "INCOME", "SCHEDULED", 5_000_00), "2026-09-15")
+      ],
+      "2026-09",
+      "2026-09-10"
+    );
+
+    expect(balance.points[9]!.cents).toBe(2_000_00);
+    expect(balance.points[10]!.cents).toBe(500_00);
+    expect(balance.points[11]!.cents).toBe(-500_00);
+    expect(balance.negativeDays).toEqual([12, 13, 14]);
+    expect(balance.lowest).toEqual({ day: 12, cents: -500_00, registered: false });
+    expect(balance.endCents).toBe(4_500_00);
+  });
+
+  it("leaves out scheduled money that never happened in a month already closed", () => {
+    const balance = calculateMonthBalance(
+      [
+        on(movement("1", "INCOME", "REGISTERED", 2_000_00), "2026-08-01"),
+        on(movement("2", "EXPENSE", "SCHEDULED", 1_500_00), "2026-08-20")
+      ],
+      "2026-08",
+      "2026-09-10"
+    );
+
+    expect(balance.lastRegisteredDay).toBe(31);
+    expect(balance.points.every((point) => point.registered)).toBe(true);
+    expect(balance.endCents).toBe(2_000_00);
+  });
+
+  it("projects everything in a month that has not started yet", () => {
+    const balance = calculateMonthBalance(
+      [on(movement("1", "EXPENSE", "SCHEDULED", 800_00), "2026-10-05")],
+      "2026-10",
+      "2026-09-10"
+    );
+
+    expect(balance.lastRegisteredDay).toBe(0);
+    expect(balance.points.some((point) => point.registered)).toBe(false);
+    expect(balance.negativeDays[0]).toBe(5);
+    expect(balance.endCents).toBe(-800_00);
   });
 });

@@ -10,6 +10,9 @@ import {
 } from "@ahorra/domain";
 import { OfflineBanner } from "../../components/OfflineBanner";
 import { ToastCard } from "../../components/Toaster";
+import { BudgetUsage } from "../budget/BudgetUsage";
+import { MonthBalanceChart } from "../dashboard/MonthBalanceChart";
+import { CategoryChanges } from "../reports/CategoryChanges";
 import { DebtKindPicker } from "../debts/DebtKindPicker";
 import { DebtsPage } from "../debts/DebtsPage";
 import { MovementCardList } from "../movements/MovementCardList";
@@ -325,5 +328,98 @@ export function ToastPreview() {
       <ToastCard message="Gasto guardado" tone="success" />
       <ToastCard message="Guardado sin conexión: se sube solo cuando vuelva la señal" tone="info" />
     </div>
+  );
+}
+
+/** Dia del mes en curso sin pasarse del ultimo, para que el ejemplo cuadre cualquier dia. */
+function dayThisMonth(day: number): string {
+  const [year, month] = today().split("-").map(Number);
+  const days = new Date(year!, month!, 0).getDate();
+  return `${today().slice(0, 7)}-${String(Math.min(Math.max(day, 1), days)).padStart(2, "0")}`;
+}
+
+function monthMovement(
+  id: string,
+  type: Movement["type"],
+  status: Movement["status"],
+  amountCents: number,
+  day: number,
+  description: string
+): Movement {
+  return {
+    id,
+    spaceId: SPACE,
+    type,
+    status,
+    amountCents,
+    effectiveDate: dayThisMonth(day),
+    description,
+    category: description,
+    createdAt: `${today()}T12:00:00.000Z`
+  };
+}
+
+/** Un mes con un bache antes de la quincena, contado desde hoy. */
+export function MonthBalancePreview() {
+  const now = Number(today().slice(8, 10));
+  const movements = [
+    monthMovement("b1", "INCOME", "REGISTERED", 32_000_00, 1, "Quincena"),
+    monthMovement("b2", "EXPENSE", "REGISTERED", 18_000_00, Math.min(2, now), "Alquiler"),
+    monthMovement("b3", "EXPENSE", "REGISTERED", 6_500_00, Math.min(6, now), "Supermercado"),
+    monthMovement("b4", "EXPENSE", "REGISTERED", 4_200_00, Math.min(10, now), "Transporte"),
+    monthMovement("b5", "EXPENSE", "REGISTERED", 2_800_00, now, "Luz"),
+    monthMovement("b6", "EXPENSE", "SCHEDULED", 3_500_00, now + 1, "Tarjeta"),
+    monthMovement("b7", "INCOME", "SCHEDULED", 32_000_00, now < 15 ? 15 : now + 3, "Quincena"),
+    monthMovement("b8", "EXPENSE", "SCHEDULED", 9_000_00, now + 6, "Préstamo"),
+    monthMovement("b9", "CONTRIBUTION", "SCHEDULED", 5_000_00, now + 9, "Ahorro")
+  ];
+  return <MonthBalanceChart movements={movements} month={today().slice(0, 7)} />;
+}
+
+/** Fijo en el dia 12 de 30, para que el ejemplo diga siempre lo mismo. */
+const PACE_EXAMPLE = { ratio: 0.4, current: true };
+
+export function BudgetPacePreview() {
+  const rows = [
+    { category: "Supermercado", spent: 7_000_00, limit: 10_000_00 },
+    { category: "Salidas", spent: 1_600_00, limit: 4_000_00 }
+  ];
+  return (
+    <div className="panel preview-budget-pace">
+      <p className="budget-pace-legend">
+        <i aria-hidden="true" /> Día 12 de 30: la marca muestra hasta dónde llegarías gastando
+        parejo todo el mes.
+      </p>
+      {rows.map((row) => (
+        <div className="budget-usage" key={row.category}>
+          <strong>{row.category}</strong>
+          <BudgetUsage spent={row.spent} limit={row.limit} elapsed={PACE_EXAMPLE} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const changesNow = calculateSummary([
+  expense("c1", "Supermercado", 12_300_00),
+  expense("c2", "Salidas", 4_100_00),
+  expense("c3", "Luz", 2_600_00),
+  expense("c4", "Transporte", 3_200_00)
+]);
+
+const changesBefore = calculateSummary([
+  expense("p1", "Supermercado", 10_000_00),
+  expense("p2", "Salidas", 3_000_00),
+  expense("p3", "Luz", 3_000_00),
+  expense("p4", "Transporte", 4_000_00)
+]);
+
+export function CategoryChangesPreview() {
+  return (
+    <CategoryChanges
+      summary={changesNow}
+      previousSummary={changesBefore}
+      month={today().slice(0, 7)}
+    />
   );
 }

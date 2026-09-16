@@ -11,7 +11,10 @@ import {
   RecurrencePreview,
   ReminderPreview,
   SanPreview,
-  ToastPreview
+  ToastPreview,
+  BudgetPacePreview,
+  CategoryChangesPreview,
+  MonthBalancePreview
 } from "./previews";
 
 export interface ReleaseEntry {
@@ -44,6 +47,36 @@ export interface Release {
  * Lo mas nuevo va primero.
  */
 export const RELEASES: Release[] = [
+  {
+    version: "0.9",
+    date: "2026-09-16",
+    title: "Gráficos que responden",
+    summary:
+      "Tres gráficos nuevos que contestan lo que de verdad te preguntas: si llegas a fin de mes, si vas muy rápido con el presupuesto y qué cambió frente al mes pasado.",
+    entries: [
+      {
+        title: "¿Llego a fin de mes?",
+        description:
+          "El inicio muestra tu disponible día a día: lo registrado hasta hoy y, punteado, lo programado hasta el cierre. Los días en que el dinero no alcanza salen en rojo, y el título te dice con cuánto cierras. Toca el gráfico para ver cada día. De paso, el inicio deja de repetir dos veces ingresos, gastos y ahorro.",
+        where: "Inicio",
+        Preview: MonthBalancePreview
+      },
+      {
+        title: "Presupuesto: ¿voy muy rápido?",
+        description:
+          "Cada barra lleva una marca con el punto del mes en que estás. Si el gasto la pasa de largo, la barra cambia de color antes de llegar al límite, cuando todavía hay tiempo de corregir.",
+        where: "Presupuesto",
+        Preview: BudgetPacePreview
+      },
+      {
+        title: "Reportes: qué cambió frente al mes anterior",
+        description:
+          "Categoría por categoría, cuánto subió o bajó tu gasto respecto al mes pasado, empezando por lo que más se movió. Antes Reportes repetía los gráficos del inicio.",
+        where: "Reportes",
+        Preview: CategoryChangesPreview
+      }
+    ]
+  },
   {
     version: "0.8",
     date: "2026-09-15",

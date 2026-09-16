@@ -670,3 +670,75 @@ export function formatDop(amountCents: number): string {
     maximumFractionDigits: 2
   }).format(amountCents / 100);
 }
+
+export interface DailyBalancePoint {
+  /** Dia del mes, del 1 al ultimo. */
+  day: number;
+  /** Disponible acumulado al terminar ese dia, contando desde el dia 1. */
+  cents: number;
+  /** Ya paso o es hoy, asi que cuenta lo registrado. Si no, es proyeccion. */
+  registered: boolean;
+}
+
+export interface MonthBalance {
+  points: DailyBalancePoint[];
+  /** Ultimo dia con datos reales: hoy, el ultimo si el mes termino, o 0 si aun no empieza. */
+  lastRegisteredDay: number;
+  /** Como cierra el mes, contando lo programado que aun no llega. */
+  endCents: number;
+  /** El punto mas bajo del mes; el primero, si se repite. */
+  lowest: DailyBalancePoint;
+  /** Dias que terminan con el disponible por debajo de cero. */
+  negativeDays: number[];
+}
+
+/**
+ * El disponible del mes dia a dia.
+ *
+ * Es la cuenta del resumen (ingresos menos gastos menos lo apartado), pero
+ * acumulada por fecha, para contestar lo que el total no dice: si en algun
+ * momento del mes el dinero no alcanza. Hasta hoy manda lo registrado; de ahi
+ * al cierre se suma lo programado en su fecha.
+ *
+ * Un programado con fecha ya pasada sigue pendiente, asi que cuenta a partir de
+ * manana y no en su dia: ponerlo atras pintaria como ocurrido algo que no
+ * ocurrio. En un mes ya cerrado no cuenta, porque nunca llego a pasar.
+ */
+export function calculateMonthBalance(
+  movements: Movement[],
+  month: string,
+  today: string
+): MonthBalance {
+  const [year, monthNumber] = month.split("-").map(Number);
+  const daysInMonth = new Date(Date.UTC(year!, monthNumber!, 0)).getUTCDate();
+  const todayMonth = today.slice(0, 7);
+  const lastRegisteredDay =
+    todayMonth > month ? daysInMonth : todayMonth < month ? 0 : Number(today.slice(8, 10));
+
+  const deltas = new Array<number>(daysInMonth + 1).fill(0);
+  for (const movement of movements) {
+    if (movement.effectiveDate.slice(0, 7) !== month) continue;
+    let day = Number(movement.effectiveDate.slice(8, 10));
+    if (movement.status === "SCHEDULED") {
+      if (todayMonth > month) continue;
+      day = Math.min(daysInMonth, Math.max(day, lastRegisteredDay + 1));
+    }
+    const signed = movement.type === "INCOME" ? movement.amountCents : -movement.amountCents;
+    deltas[day] = (deltas[day] ?? 0) + signed;
+  }
+
+  let cumulative = 0;
+  const points: DailyBalancePoint[] = [];
+  for (let day = 1; day <= daysInMonth; day++) {
+    cumulative += deltas[day] ?? 0;
+    points.push({ day, cents: cumulative, registered: day <= lastRegisteredDay });
+  }
+
+  return {
+    points,
+    lastRegisteredDay,
+    endCents: cumulative,
+    lowest: points.reduce((low, point) => (point.cents < low.cents ? point : low), points[0]!),
+    negativeDays: points.filter((point) => point.cents < 0).map((point) => point.day)
+  };
+}

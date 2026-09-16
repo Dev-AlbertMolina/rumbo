@@ -9,11 +9,10 @@ import { RumboLogo } from "../components/layout/RumboLogo";
 import { Sidebar } from "../components/layout/Sidebar";
 import { UserMenu } from "../components/layout/UserMenu";
 import { Stat } from "../components/Stat";
-import { CashFlowChart } from "../features/dashboard/CashFlowChart";
 import { CategoryChart } from "../features/dashboard/CategoryChart";
 import { BalanceCard } from "../features/dashboard/BalanceCard";
 import { EmptyState } from "../features/dashboard/EmptyState";
-import { Projection } from "../features/dashboard/Projection";
+import { MonthBalanceChart } from "../features/dashboard/MonthBalanceChart";
 import { RecentMovements } from "../features/dashboard/RecentMovements";
 import { MovementDialog } from "../features/movements/MovementDialog";
 import { MovementsPage } from "../features/movements/MovementsPage";
@@ -31,7 +30,6 @@ import { useMonthlyData } from "../hooks/useMonthlyData";
 import { useModuleData } from "../hooks/useModuleData";
 import { useBalance } from "../hooks/useBalance";
 import { useCountUp } from "../hooks/useCountUp";
-import { usePreviousMonthSummary } from "../hooks/usePreviousMonthSummary";
 import { useWhatsNew } from "../hooks/useWhatsNew";
 import { useOfflineSync } from "../hooks/useOfflineSync";
 import { useReminder } from "../hooks/useReminder";
@@ -72,7 +70,6 @@ export default function App() {
   const error = spacesError || monthlyError || moduleError;
   const { balance } = useBalance(accessToken, spaceId, refreshKey, auth.user?.id);
   const animatedAvailable = useCountUp(summary.availableAfterSavingsCents);
-  const previousSummary = usePreviousMonthSummary(accessToken, spaceId, month);
   const whatsNew = useWhatsNew(auth.user);
   const offline = useOfflineSync(auth.user?.id, accessToken, () =>
     setRefreshKey((value) => value + 1)
@@ -233,14 +230,13 @@ export default function App() {
                   />
                 ) : (
                   <div className="dashboard-grid">
-                    <CashFlowChart summary={summary} previousSummary={previousSummary} />
-                    <CategoryChart summary={summary} />
+                    <MonthBalanceChart movements={movements} month={month} />
                     <RecentMovements
                       movements={movements}
                       onEdit={editMovement}
                       onViewAll={() => navigate("/movimientos")}
                     />
-                    <Projection summary={summary} movements={movements} />
+                    <CategoryChart summary={summary} />
                   </div>
                 )}
               </>

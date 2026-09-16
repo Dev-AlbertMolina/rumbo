@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Summary } from "@ahorra/domain";
 import { apiFetch } from "../lib/api";
-import { readJson } from "../lib/format";
-
-function previousMonth(month: string): string {
-  const [year, value] = month.split("-").map(Number);
-  const date = new Date(year!, value! - 2, 1);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-}
+import { previousMonth, readJson } from "../lib/format";
 
 /** Fetches the prior month's summary so charts can show a light reference. */
 export function usePreviousMonthSummary(

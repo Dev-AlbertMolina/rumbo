@@ -5,7 +5,7 @@ import {
   type ExpenseCategory,
   type Summary
 } from "@ahorra/domain";
-import { AlertTriangle, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { type FormEvent, useEffect, useState } from "react";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
@@ -16,7 +16,8 @@ import { toast } from "../../components/Toaster";
 import { apiFetch } from "../../lib/api";
 import { expenseCategories } from "../../lib/categories";
 import { CategoryIcon } from "../../lib/categoryIcons";
-import { monthLabel } from "../../lib/format";
+import { monthElapsed, monthLabel } from "../../lib/format";
+import { BudgetUsage } from "./BudgetUsage";
 
 export function BudgetPage({
   accessToken,
@@ -70,6 +71,8 @@ export function BudgetPage({
     (total, category) => total + Math.round(Number(values[category] || 0) * 100),
     0
   );
+
+  const elapsed = monthElapsed(month);
 
   // Se evalua contra lo que hay escrito en los campos, no contra lo guardado,
   // para que al teclear un limite mas bajo el aviso aparezca antes de guardar.
@@ -236,12 +239,16 @@ export function BudgetPage({
           </div>
           <span>Plan por categoría</span>
         </header>
+        {elapsed.current && (
+          <p className="budget-pace-legend">
+            <i aria-hidden="true" /> Día {elapsed.day} de {elapsed.days}: la marca muestra hasta
+            dónde llegarías gastando parejo todo el mes.
+          </p>
+        )}
         {categories.map((category) => {
           const spent =
             summary.expenseByCategory.find((item) => item.category === category)?.amountCents ?? 0;
           const limit = Math.round(Number(values[category] || 0) * 100);
-          const percent = limit > 0 ? Math.round((spent / limit) * 100) : 0;
-          const remaining = limit - spent;
           const customCat = !expenseCategories.includes(category)
             ? customCategories.find((c) => c.name === category)
             : undefined;
@@ -304,34 +311,12 @@ export function BudgetPage({
               </div>
               <div className="budget-usage">
                 {limit > 0 ? (
-                  <>
-                    <div className="budget-progress">
-                      <span
-                        style={{ width: `${Math.min(percent, 100)}%` }}
-                        className={percent > 100 ? "over" : ""}
-                      />
-                    </div>
-                    <div className="budget-status">
-                      <span>
-                        {formatDop(spent)} de {formatDop(limit)}
-                      </span>
-                      <strong className={remaining < 0 ? "danger-text" : ""}>
-                        {remaining >= 0
-                          ? `${formatDop(remaining)} disponibles`
-                          : `Excedido por ${formatDop(Math.abs(remaining))}`}
-                      </strong>
-                    </div>
-                    {alertLevels.get(category) === "OVER" ? (
-                      <p className="budget-flag over">
-                        <AlertTriangle size={14} aria-hidden="true" /> Te pasaste del límite
-                      </p>
-                    ) : alertLevels.get(category) === "NEAR" ? (
-                      <p className="budget-flag near">
-                        <AlertTriangle size={14} aria-hidden="true" /> Ya usaste el {percent}% del
-                        límite
-                      </p>
-                    ) : null}
-                  </>
+                  <BudgetUsage
+                    spent={spent}
+                    limit={limit}
+                    level={alertLevels.get(category)}
+                    elapsed={elapsed}
+                  />
                 ) : (
                   <span className="no-limit-message">
                     Define un límite para comparar este gasto.
