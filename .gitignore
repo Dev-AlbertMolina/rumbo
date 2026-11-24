@@ -10,3 +10,6 @@ coverage/
 !apps/web/.env.native
 apps/api/data/
 apps/web/dev-dist/
+
+# Scratch de ejecucion de planes (superpowers): ledger, briefs y paquetes de revision.
+.superpowers/
