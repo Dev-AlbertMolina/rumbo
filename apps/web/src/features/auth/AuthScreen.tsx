@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "../../lib/supabase";
+import { describeAuthError } from "./authErrors";
 import { FullScreenLoader } from "./AuthProvider";
 
 type AuthMode = "SIGN_IN" | "SIGN_UP" | "RECOVERY";
@@ -56,12 +57,7 @@ export function AuthScreen() {
       if (signInError) throw signInError;
     } catch (err) {
       console.error("Authentication error:", err);
-      // Supabase lanza errores con `message`, pero aqui puede caer cualquier
-      // cosa: comprobarlo es mas corto que fingir que siempre es un Error.
-      const message = err instanceof Error ? err.message : "";
-      setError(
-        message || "No pudimos completar la solicitud. Revisa los datos e inténtalo de nuevo."
-      );
+      setError(describeAuthError(err));
     } finally {
       setLoading(false);
     }
