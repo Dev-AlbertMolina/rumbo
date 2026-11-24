@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 describe("styles.css", () => {
   const css = readFileSync("src/styles.css", "utf8");
 
-  it("no usa backdrop-filter: cuesta 125 ms la primera vez que se abre un dialogo", () => {
+  it("no usa backdrop-filter: la primera apertura de cada sesion pasaba de 146 a 83 ms sin el", () => {
     expect(css).not.toContain("backdrop-filter");
   });
 

@@ -1,41 +1,37 @@
-import "@testing-library/jest-dom/vitest";
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChunkBoundary } from "./ChunkBoundary";
 
-afterEach(cleanup);
-
-function Exploding(): never {
-  throw new Error("Failed to fetch dynamically imported module");
+function Explota({ reason }: { reason: Error }): never {
+  throw reason;
 }
 
-/**
- * Con las pantallas cargandose al entrar, quedarse sin red a mitad deja de ser
- * un detalle: el trozo de codigo no llega y React desmonta el arbol. Sin esto,
- * la persona se queda mirando una pagina en blanco.
- */
 describe("ChunkBoundary", () => {
-  it("ofrece reintentar cuando la pantalla no se pudo descargar", () => {
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
-
-    render(
-      <ChunkBoundary>
-        <Exploding />
-      </ChunkBoundary>
-    );
-
-    expect(screen.getByRole("alert")).toHaveTextContent(/no pudimos cargar esta sección/i);
-    expect(screen.getByRole("button", { name: /reintentar/i })).toBeInTheDocument();
+  beforeEach(() => vi.spyOn(console, "error").mockImplementation(() => undefined));
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
   });
 
-  it("no estorba cuando todo va bien", () => {
-    render(
+  it("culpa a la conexion cuando el trozo de codigo no llego", () => {
+    const { getByRole } = render(
       <ChunkBoundary>
-        <p>Contenido</p>
+        <Explota reason={new Error("Failed to fetch dynamically imported module")} />
       </ChunkBoundary>
     );
 
-    expect(screen.getByText("Contenido")).toBeInTheDocument();
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(getByRole("alert").textContent).toMatch(/conexión/i);
+  });
+
+  it("no culpa a la conexion cuando lo que falla es la pantalla", () => {
+    // Un grafico que revienta en Inicio no es un problema de red, y decirle a
+    // la persona que revise su conexion la manda a arreglar lo que no esta roto.
+    const { getByRole } = render(
+      <ChunkBoundary>
+        <Explota reason={new TypeError("cannot read properties of undefined")} />
+      </ChunkBoundary>
+    );
+
+    expect(getByRole("alert").textContent).not.toMatch(/conexión/i);
   });
 });

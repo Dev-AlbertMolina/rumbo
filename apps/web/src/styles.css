@@ -624,7 +624,40 @@ h2 {
 /* Mes en camino: lo que hay sigue a la vista, atenuado, en vez de desaparecer
    y volver. La transicion se apaga sola con el bloque de reducir movimiento. */
 .page-transition.is-stale {
-  opacity: 0.55;
+  /* Un gesto, no el aviso: al 55% las cifras quedaban en 3.6:1 sobre papel y
+     lo apagado en 2.4:1, por debajo de lo legible. Quien avisa es la pildora. */
+  opacity: 0.85;
+}
+.stale-notice {
+  position: sticky;
+  top: 12px;
+  z-index: 2;
+  justify-self: center;
+  width: fit-content;
+  margin: 0 auto 10px;
+  padding: 5px 13px;
+  border-radius: var(--radius-full);
+  background: var(--muted-surface);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  /* Aparece solo si la espera se nota: por debajo de 400 ms seria un parpadeo
+     mas, que es justo lo que esta version vino a quitar. */
+  animation: staleIn 150ms var(--ease-out) 400ms both;
+}
+@keyframes staleIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stale-notice {
+    animation: none;
+  }
 }
 .page-transition {
   transition: opacity 150ms var(--ease-out);

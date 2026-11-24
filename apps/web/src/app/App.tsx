@@ -53,6 +53,7 @@ import { WhatsNewPanel } from "../components/WhatsNewPanel";
 import { OfflineBanner } from "../components/OfflineBanner";
 import { ChunkBoundary } from "../components/ChunkBoundary";
 import { MotionProvider } from "../components/MotionProvider";
+import { StaleNotice } from "./StaleNotice";
 import { PageFallback } from "../components/PageFallback";
 import { Toaster } from "../components/Toaster";
 import { expenseCategories } from "../lib/categories";
@@ -167,7 +168,12 @@ export default function App() {
             </div>
           </header>
 
-          <div key={pathname} className={`page-transition${stale ? " is-stale" : ""}`}>
+          {stale && <StaleNotice />}
+          <div
+            key={pathname}
+            className={`page-transition${stale ? " is-stale" : ""}`}
+            aria-busy={stale}
+          >
             <ChunkBoundary>
               <Suspense fallback={<PageFallback />}>
                 {pathname === "/" || pathname === "/inicio" ? (
