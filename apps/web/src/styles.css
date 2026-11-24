@@ -621,6 +621,14 @@ h2 {
 .page-transition {
   animation: pageIn 0.16s var(--ease-out) backwards;
 }
+/* Mes en camino: lo que hay sigue a la vista, atenuado, en vez de desaparecer
+   y volver. La transicion se apaga sola con el bloque de reducir movimiento. */
+.page-transition.is-stale {
+  opacity: 0.55;
+}
+.page-transition {
+  transition: opacity 150ms var(--ease-out);
+}
 @keyframes pageIn {
   from {
     opacity: 0;

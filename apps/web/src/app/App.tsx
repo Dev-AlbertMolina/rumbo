@@ -74,6 +74,7 @@ export default function App() {
     summary,
     movements,
     loading,
+    stale,
     error: monthlyError
   } = useMonthlyData(accessToken, spaceId, month, refreshKey, auth.user?.id);
   const {
@@ -166,7 +167,7 @@ export default function App() {
             </div>
           </header>
 
-          <div key={pathname} className="page-transition">
+          <div key={pathname} className={`page-transition${stale ? " is-stale" : ""}`}>
             <ChunkBoundary>
               <Suspense fallback={<PageFallback />}>
                 {pathname === "/" || pathname === "/inicio" ? (
@@ -175,7 +176,7 @@ export default function App() {
                       <div>
                         <p className="eyebrow">Disponible después de ahorro</p>
                         <h1 id="available-title">
-                          {loading ? (
+                          {loading && !stale ? (
                             <span
                               className="skeleton skeleton-hero-number"
                               aria-label="Calculando"
@@ -185,7 +186,7 @@ export default function App() {
                           )}
                         </h1>
                         <p>Para {monthLabel(month)} según tus registros</p>
-                        {!loading && (
+                        {(!loading || stale) && (
                           <BalanceBridge
                             beforeSavingsCents={summary.availableBeforeSavingsCents}
                             contributionCents={summary.contributionCents}
@@ -200,7 +201,7 @@ export default function App() {
                       </div>
                     </section>
 
-                    {!loading && summary.availableAfterSavingsCents < 0 && (
+                    {(!loading || stale) && summary.availableAfterSavingsCents < 0 && (
                       <section className="allocation-alert" role="status">
                         <div>
                           <span aria-hidden="true">!</span>
@@ -234,9 +235,11 @@ export default function App() {
                       onSync={() => void offline.sync()}
                     />
 
-                    {!loading && <BalanceCard balance={balance} />}
+                    {(!loading || stale) && <BalanceCard balance={balance} />}
 
-                    {!loading && <BudgetAlertBanner limits={budgetLimits} summary={summary} />}
+                    {(!loading || stale) && (
+                      <BudgetAlertBanner limits={budgetLimits} summary={summary} />
+                    )}
 
                     {error && (
                       <div className="error-banner" role="alert">

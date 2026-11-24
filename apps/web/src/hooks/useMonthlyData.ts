@@ -77,5 +77,10 @@ export function useMonthlyData(
     return () => controller.abort();
   }, [accessToken, spaceId, month, refreshKey, userId]);
 
-  return { summary, movements, loading, error };
+  // Cambiar de mes no vacia la pantalla: lo anterior se queda a la vista,
+  // atenuado, hasta que llega lo nuevo. Solo la primera carga, cuando no hay
+  // nada que conservar, muestra esqueletos.
+  const stale = loading && movements.length > 0;
+
+  return { summary, movements, loading, stale, error };
 }
