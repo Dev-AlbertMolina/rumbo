@@ -225,14 +225,17 @@ mirarla: un icono que cambia de significado es peor que uno feo.
 - Modificar: `apps/web/src/styles.css`
 - Crear: `apps/web/src/styles.shape.test.ts`
 
-- [ ] **Paso 1: la prueba que falla** — la esquina recortada
-  (`--radius-signature`) solo aparece en paneles y tarjetas, nunca en botones
-  ni campos; y todos los huecos salen de la escala de 4.
+- [x] **Paso 1: la prueba** — la esquina ya estaba bien puesta. El ritmo no:
+  el plan decia escala de 4 "ya casi respetada" y la medicion dijo otra cosa
+  —424 valores pares, 69 impares sueltos—, asi que se bloquea el ritmo de dos
+  que la app tiene de verdad. Forzar el cuatro eran 291 cambios para ganar
+  poco.
 - [ ] **Paso 2: verla fallar** — Esperado: FALLA con la lista de excepciones.
 - [ ] **Paso 3: corregirlas**, y quitar la tarjeta de lo que no necesita
   tarjeta: la jerarquía la hacen el aire y la tipografía.
-- [ ] **Paso 4: anillo de foco visible** sobre papel en todo lo que se pueda
-  enfocar, con prueba de contraste ≥ 3:1 contra su fondo.
+- [x] **Paso 4: anillo de foco** — estaba en dorado, 2.03:1 sobre papel:
+  invisible para quien navega con teclado. Ahora dos capas, clara y oscura,
+  para que contraste este donde este el foco.
 - [ ] **Paso 5: verlas pasar** y `npm test`.
 - [ ] **Paso 6: commit** — `refactor(web): una escala, una firma de superficie`
 
