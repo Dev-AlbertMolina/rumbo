@@ -10,6 +10,7 @@ import {
 } from "@ahorra/domain";
 import { OfflineBanner } from "../../components/OfflineBanner";
 import { ToastCard } from "../../components/Toaster";
+import { describeAuthError } from "../auth/authErrors";
 import { BudgetUsage } from "../budget/BudgetUsage";
 import { MonthBalanceChart } from "../dashboard/MonthBalanceChart";
 import { CategoryChanges } from "../reports/CategoryChanges";
@@ -421,5 +422,16 @@ export function CategoryChangesPreview() {
       previousSummary={changesBefore}
       month={today().slice(0, 7)}
     />
+  );
+}
+
+/** El aviso de la pantalla de entrada cuando el servidor no contesta. */
+export function ServiceErrorPreview() {
+  return (
+    <div className="panel">
+      <p className="auth-error" role="alert">
+        {describeAuthError(new TypeError("Failed to fetch"))}
+      </p>
+    </div>
   );
 }

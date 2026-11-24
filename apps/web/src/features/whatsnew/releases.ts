@@ -27,6 +27,39 @@ export interface Release {
  */
 export const RELEASES: Release[] = [
   {
+    version: "1.0",
+    date: "2026-11-24",
+    title: "Más rápida, y se cuida sola",
+    summary:
+      "Nada nuevo que tocar: lo que ya había ahora abre antes, no parpadea, te devuelve donde estabas y dice la verdad cuando algo falla.",
+    entries: [
+      {
+        title: "Abre más rápido en el teléfono",
+        description:
+          "Antes el teléfono descargaba la app entera —todas las pantallas— antes de enseñarte nada, aunque solo fueras a anotar un gasto. Ahora cada pantalla llega cuando entras en ella: la primera carga pesa un 9% menos y Deudas, Reportes o Metas ya no estorban al arranque. Y el panel para registrar un movimiento abre sin ese tirón del principio, que resultó ser el desenfoque del fondo: costaba 125 milésimas la primera vez de cada sesión.",
+        where: "En toda la app"
+      },
+      {
+        title: "Cambiar de mes ya no parpadea",
+        description:
+          "Al cambiar de periodo la pantalla se vaciaba y volvía un instante después. Ahora lo que estás mirando se queda, apenas atenuado, hasta que llegan las cifras del mes nuevo.",
+        where: "Inicio"
+      },
+      {
+        title: "Vuelves donde estabas",
+        description:
+          "Ir a mirar una cifra a otra sección y volver te dejaba arriba del todo y sin los filtros que tenías puestos. Ahora cada pestaña recuerda dónde estabas mientras dure la sesión.",
+        where: "Movimientos y el resto de secciones"
+      },
+      {
+        title: "Te dice la verdad cuando algo falla",
+        description:
+          "En septiembre el servidor estuvo caído nueve días y la pantalla decía «revisa los datos», como si la contraseña estuviera mal. Ahora distingue tres cosas distintas: que el servidor no responde, que tu sesión caducó, y que de verdad escribiste algo mal. Además la app se vigila sola: una comprobación diaria avisa si el servicio se cae, y de paso evita que se apague por falta de uso, que fue justo lo que pasó.",
+        where: "Al iniciar sesión"
+      }
+    ]
+  },
+  {
     version: "0.9",
     date: "2026-09-16",
     title: "Gráficos que responden",

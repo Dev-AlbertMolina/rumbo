@@ -14,6 +14,7 @@ import {
   RecurrencePreview,
   ReminderPreview,
   SanPreview,
+  ServiceErrorPreview,
   ToastPreview
 } from "./previews";
 
@@ -30,6 +31,7 @@ import {
  * ninguna quede huerfana.
  */
 export const RELEASE_PREVIEWS: Record<string, ComponentType> = {
+  "Te dice la verdad cuando algo falla": ServiceErrorPreview,
   "¿Llego a fin de mes?": MonthBalancePreview,
   "Presupuesto: ¿voy muy rápido?": BudgetPacePreview,
   "Reportes: qué cambió frente al mes anterior": CategoryChangesPreview,
