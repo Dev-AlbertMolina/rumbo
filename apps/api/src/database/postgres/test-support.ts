@@ -80,6 +80,9 @@ export function createNonClosingPersistence(pool: Pool): FinancePersistence {
     forUser(userId: string): UserFinanceRepository {
       return delegate.forUser(userId);
     },
-    async close(): Promise<void> {}
+    async close(): Promise<void> {},
+    ping(): Promise<boolean> {
+      return delegate.ping();
+    }
   };
 }

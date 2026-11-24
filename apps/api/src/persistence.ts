@@ -74,4 +74,6 @@ export interface UserFinanceRepository {
 export interface FinancePersistence {
   forUser(userId: string): UserFinanceRepository;
   close(): Awaitable<void>;
+  /** Si la base contesta. Lo usa la ruta de salud; no mira datos de nadie. */
+  ping(): Awaitable<boolean>;
 }

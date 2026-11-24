@@ -47,6 +47,10 @@ export function buildApp(persistence: FinancePersistence, options: BuildAppOptio
   app.register(cors, { origin: allowedOrigins });
 
   app.addHook("preHandler", async (request, reply) => {
+    // La salud va por /api/ porque vercel.json solo reescribe eso, pero no
+    // lleva sesion: la visita diaria que mantiene vivo el proyecto no tiene
+    // con quien autenticarse. No devuelve dato de nadie, solo si la base esta.
+    if (request.url.startsWith("/api/health")) return;
     if (!request.url.startsWith("/api/") || request.method === "OPTIONS") return;
     if (!options.authVerifier) {
       return reply.code(503).send({ message: "Supabase Auth todavia no esta configurado." });
@@ -67,6 +71,13 @@ export function buildApp(persistence: FinancePersistence, options: BuildAppOptio
   }
 
   app.get("/health", async () => ({ status: "ok" }));
+
+  app.get("/api/health", async (_request, reply) => {
+    const alive = await persistence.ping();
+    return alive
+      ? { status: "ok", database: "ok" }
+      : reply.code(503).send({ status: "degraded", database: "down" });
+  });
 
   app.get("/api/v1/me", async (request, reply) => {
     const user = authenticatedUsers.get(request);

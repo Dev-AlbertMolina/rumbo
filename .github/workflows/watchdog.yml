@@ -1,0 +1,24 @@
+# Visita diaria a la app publicada.
+#
+# Hace dos cosas con una sola peticion: avisa si el servicio esta caido (el
+# fallo del workflow manda correo al dueno del repositorio) y mantiene despierto
+# el proyecto de Supabase, que en el plan gratuito se pausa tras unos dias sin
+# actividad. En septiembre de 2026 se pauso y nadie se entero durante nueve
+# dias, hasta que alguien intento iniciar sesion.
+name: Watchdog
+
+on:
+  schedule:
+    # 12:00 UTC = 08:00 en Republica Dominicana.
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: La app responde y su base esta viva
+        run: |
+          curl -fsS --max-time 30 https://rumbo-web-sepia.vercel.app/api/health \
+            | tee /dev/stderr \
+            | grep -q '"database":"ok"'

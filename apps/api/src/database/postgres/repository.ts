@@ -324,6 +324,15 @@ export class PostgresFinancePersistence implements FinancePersistence {
   async close(): Promise<void> {
     await this.pool.end();
   }
+
+  async ping(): Promise<boolean> {
+    try {
+      await this.pool.query("select 1");
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 
 class PostgresFinanceRepository implements UserFinanceRepository {
