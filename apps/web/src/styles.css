@@ -2194,11 +2194,14 @@ h2 {
 .floating-add {
   display: none;
 }
+/* Sin desenfoque a proposito: montar esa capa le costaba al navegador 146 ms
+   la primera vez que se abria un dialogo, y 21 ms sin ella. Lo pagaba justo
+   quien abre la app y registra su primer gasto. La separacion entre capas la
+   hace el fondo, un poco mas oscuro para compensar. */
 .dialog-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(43, 33, 30, 0.34);
-  backdrop-filter: blur(3px);
+  background: rgba(43, 33, 30, 0.46);
   z-index: 50;
   display: flex;
   justify-content: end;
