@@ -50,7 +50,7 @@ export function buildApp(persistence: FinancePersistence, options: BuildAppOptio
     // La salud va por /api/ porque vercel.json solo reescribe eso, pero no
     // lleva sesion: la visita diaria que mantiene vivo el proyecto no tiene
     // con quien autenticarse. No devuelve dato de nadie, solo si la base esta.
-    if (request.url.startsWith("/api/health")) return;
+    if (request.url === "/api/health" || request.url.startsWith("/api/health?")) return;
     if (!request.url.startsWith("/api/") || request.method === "OPTIONS") return;
     if (!options.authVerifier) {
       return reply.code(503).send({ message: "Supabase Auth todavia no esta configurado." });

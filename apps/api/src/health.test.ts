@@ -46,6 +46,13 @@ describe("GET /api/health", () => {
     expect(response.json()).toEqual({ status: "degraded", database: "down" });
   });
 
+  it("la excepcion es esa ruta exacta, no todo lo que empiece igual", async () => {
+    const app = buildApp(persistenceThatAnswers(true), { authVerifier });
+    const response = await app.inject({ method: "GET", url: "/api/healthzzz" });
+
+    expect(response.statusCode).toBe(401);
+  });
+
   it("no abre la puerta al resto de la API", async () => {
     const app = buildApp(persistenceThatAnswers(true), { authVerifier });
     const response = await app.inject({ method: "GET", url: "/api/spaces" });

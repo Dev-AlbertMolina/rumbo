@@ -81,6 +81,41 @@ describe("useMonthlyData", () => {
     expect(result.current.summary.expenseCents).toBe(0);
   });
 
+  it("sigue atenuado si cambias de mes dos veces seguidas", async () => {
+    // La peticion cancelada no puede apagar el indicador de la que si sigue
+    // viva: si lo hace, el mes viejo se queda en pantalla como si fuera el nuevo.
+    const octubre = [movement("octubre", "2026-10")];
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        const month = String(input).match(/month=([\d-]+)/)?.[1] ?? "";
+        if (month === "2026-10") {
+          return new Response(JSON.stringify(octubre), {
+            headers: { "Content-Type": "application/json" }
+          });
+        }
+        // Como el fetch de verdad: al cancelarla, la peticion rechaza.
+        return new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () =>
+            reject(new DOMException("The operation was aborted.", "AbortError"))
+          );
+        });
+      }
+    );
+
+    const { result, rerender } = renderHook(
+      ({ month }) => useMonthlyData("token", "espacio", month, 0, "usuario"),
+      { initialProps: { month: "2026-10" } }
+    );
+    await waitFor(() => expect(result.current.movements).toHaveLength(1));
+
+    rerender({ month: "2026-11" });
+    rerender({ month: "2026-12" });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(result.current.movements).toHaveLength(1);
+    expect(result.current.stale).toBe(true);
+  });
+
   it("suelta los datos al cambiar de usuario", async () => {
     const { fetchMock } = serverWith({ "2026-10": [movement("octubre", "2026-10")] });
     vi.spyOn(globalThis, "fetch").mockImplementation(fetchMock);

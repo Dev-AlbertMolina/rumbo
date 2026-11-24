@@ -39,6 +39,10 @@ export function useMonthlyData(
       return;
     }
     const controller = new AbortController();
+    // Una peticion que ya fue reemplazada no puede tocar el estado: si la
+    // cancelada apaga el indicador, el mes viejo se queda en pantalla sin
+    // atenuar, como si fuera el que pediste.
+    let current = true;
     setLoading(true);
     setError("");
 
@@ -55,6 +59,7 @@ export function useMonthlyData(
         // aqui en vez de pedirlo: el servidor no sabe nada de lo que aun no ha
         // recibido, y ver un gasto en la lista que no descuenta del disponible
         // haria dudar de todas las cifras.
+        if (!current) return;
         const all = [...queued, ...serverMovements];
         startTransition(() => {
           setMovements(all);
@@ -62,6 +67,7 @@ export function useMonthlyData(
         });
       })
       .catch((reason: unknown) => {
+        if (!current) return;
         if (reason instanceof DOMException && reason.name === "AbortError") return;
         // Sin servidor, al menos se muestra lo que hay guardado en el aparato.
         if (userId) {
@@ -74,9 +80,14 @@ export function useMonthlyData(
         }
         setError(reason instanceof Error ? reason.message : "Ocurrio un error inesperado.");
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (current) setLoading(false);
+      });
 
-    return () => controller.abort();
+    return () => {
+      current = false;
+      controller.abort();
+    };
   }, [accessToken, spaceId, month, refreshKey, userId]);
 
   // Cambiar de mes no vacia la pantalla: lo anterior se queda a la vista,

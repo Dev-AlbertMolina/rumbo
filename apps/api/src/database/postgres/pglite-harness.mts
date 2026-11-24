@@ -89,7 +89,9 @@ for (const file of files) {
 // util que la cascada de fallos que vendria detras.
 if (results.some((result) => !result.ok)) {
   for (const result of results) {
-    console.log(`${result.ok ? "OK  " : "FALLA"} ${result.label}${result.detail ? ` -> ${result.detail}` : ""}`);
+    console.log(
+      `${result.ok ? "OK  " : "FALLA"} ${result.label}${result.detail ? ` -> ${result.detail}` : ""}`
+    );
   }
   await database.close();
   process.exit(1);
@@ -216,10 +218,10 @@ await expectFailure(
 );
 
 // --- Recibos ---------------------------------------------------------------
-await database.query(
-  "update public.movements set receipt_path = $2 where user_id = $1",
-  [userId, `${userId}/recibo.jpg`]
-);
+await database.query("update public.movements set receipt_path = $2 where user_id = $1", [
+  userId,
+  `${userId}/recibo.jpg`
+]);
 check("guardar la ruta del recibo", true);
 
 // --- Aislamiento entre usuarios -------------------------------------------
@@ -237,7 +239,9 @@ await database.close();
 
 // --- Informe ---------------------------------------------------------------
 for (const result of results) {
-  console.log(`${result.ok ? "OK  " : "FALLA"} ${result.label}${result.detail ? ` -> ${result.detail}` : ""}`);
+  console.log(
+    `${result.ok ? "OK  " : "FALLA"} ${result.label}${result.detail ? ` -> ${result.detail}` : ""}`
+  );
 }
 const failed = results.filter((result) => !result.ok).length;
 console.log(`\n${results.length - failed}/${results.length} comprobaciones en verde`);
