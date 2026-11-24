@@ -27,6 +27,23 @@ describe("describeAuthError", () => {
     );
   });
 
+  it("culpa al servidor cuando Supabase responde con un 503", () => {
+    // Lo que de verdad llego en septiembre: el proyecto pausado contesta, pero
+    // contesta un error de servicio, en ingles, y eso se mostraba tal cual.
+    const error = Object.assign(new Error("Service temporarily unavailable"), { status: 503 });
+    expect(describeAuthError(error)).toMatch(/no pudimos conectar/i);
+  });
+
+  it("tambien cuando la peticion no llego a ninguna parte (status 0)", () => {
+    const error = Object.assign(new Error("fetch failed"), { status: 0 });
+    expect(describeAuthError(error)).toMatch(/no pudimos conectar/i);
+  });
+
+  it("no se inventa una caida cuando el rechazo es por los datos", () => {
+    const error = Object.assign(new Error("Invalid login credentials"), { status: 400 });
+    expect(describeAuthError(error)).toBe("Invalid login credentials");
+  });
+
   it("tiene algo que decir cuando no llega un Error", () => {
     expect(describeAuthError(undefined)).toMatch(/inténtalo/i);
   });

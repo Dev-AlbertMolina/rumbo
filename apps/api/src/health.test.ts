@@ -46,6 +46,46 @@ describe("GET /api/health", () => {
     expect(response.json()).toEqual({ status: "degraded", database: "down" });
   });
 
+  it("dice que esta caida tambien cuando preguntar revienta", async () => {
+    // Una base que rechaza la conexion hace que `ping` lance, no que devuelva
+    // false. Sin recogerlo, el vigilante recibe un 500 de Fastify sin cuerpo:
+    // sabe que algo va mal y nada mas.
+    const persistence: FinancePersistence = {
+      forUser(): UserFinanceRepository {
+        throw new Error("La ruta de salud no debe tocar los datos de nadie.");
+      },
+      async close() {},
+      async ping(): Promise<boolean> {
+        throw new Error("connection refused");
+      }
+    };
+    const app = buildApp(persistence, { authVerifier });
+    const response = await app.inject({ method: "GET", url: "/api/health" });
+
+    expect(response.statusCode).toBe(503);
+    expect(response.json()).toEqual({ status: "degraded", database: "down" });
+  });
+
+  it("no se queda esperando para siempre a una base que no contesta", async () => {
+    // Lo que hace una base sobrecargada: acepta la conexion y no responde. Sin
+    // plazo propio, la peticion se queda colgada y el vigilante no se entera de
+    // nada, que es justo lo contrario de para lo que existe.
+    const persistence: FinancePersistence = {
+      forUser(): UserFinanceRepository {
+        throw new Error("La ruta de salud no debe tocar los datos de nadie.");
+      },
+      async close() {},
+      ping() {
+        return new Promise<boolean>(() => undefined);
+      }
+    };
+    const app = buildApp(persistence, { authVerifier, healthTimeoutMs: 20 });
+    const response = await app.inject({ method: "GET", url: "/api/health" });
+
+    expect(response.statusCode).toBe(503);
+    expect(response.json()).toEqual({ status: "degraded", database: "down" });
+  });
+
   it("la excepcion es esa ruta exacta, no todo lo que empiece igual", async () => {
     const app = buildApp(persistenceThatAnswers(true), { authVerifier });
     const response = await app.inject({ method: "GET", url: "/api/healthzzz" });

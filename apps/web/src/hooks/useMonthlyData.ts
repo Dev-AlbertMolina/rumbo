@@ -15,6 +15,23 @@ const emptySummary: Summary = {
   expenseByCategory: []
 };
 
+/**
+ * Las cifras no viajan solas: viajan con el mes al que pertenecen.
+ *
+ * Es lo que permite saber, en cualquier render, si lo que se ve es del mes que
+ * la persona pidio o del anterior. Guardar "estoy cargando" por separado no
+ * sirve: entre que llegan los datos nuevos y que se apaga el indicador cabe un
+ * render, y en ese render las cifras de octubre se leen bajo el rotulo de
+ * diciembre como si fueran suyas.
+ */
+interface MonthData {
+  month: string;
+  movements: Movement[];
+  summary: Summary;
+}
+
+const emptyData: MonthData = { month: "", movements: [], summary: emptySummary };
+
 export function useMonthlyData(
   accessToken: string | undefined,
   spaceId: string,
@@ -22,28 +39,23 @@ export function useMonthlyData(
   refreshKey: number,
   userId: string | undefined
 ) {
-  const [summary, setSummary] = useState(emptySummary);
-  const [movements, setMovements] = useState<Movement[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<MonthData>(emptyData);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setSummary(emptySummary);
-    setMovements([]);
+    setData(emptyData);
     forgetViews();
   }, [userId]);
 
   useEffect(() => {
     if (!accessToken || !spaceId) {
-      setLoading(false);
+      setData({ month, movements: [], summary: emptySummary });
       return;
     }
     const controller = new AbortController();
-    // Una peticion que ya fue reemplazada no puede tocar el estado: si la
-    // cancelada apaga el indicador, el mes viejo se queda en pantalla sin
-    // atenuar, como si fuera el que pediste.
+    // Una peticion que ya fue reemplazada no puede tocar el estado: lo que
+    // escriba seria del mes que la persona dejo atras.
     let current = true;
-    setLoading(true);
     setError("");
 
     Promise.all([
@@ -62,26 +74,22 @@ export function useMonthlyData(
         if (!current) return;
         const all = [...queued, ...serverMovements];
         startTransition(() => {
-          setMovements(all);
-          setSummary(calculateSummary(all));
+          setData({ month, movements: all, summary: calculateSummary(all) });
         });
       })
-      .catch((reason: unknown) => {
+      .catch(async (reason: unknown) => {
         if (!current) return;
         if (reason instanceof DOMException && reason.name === "AbortError") return;
-        // Sin servidor, al menos se muestra lo que hay guardado en el aparato.
-        if (userId) {
-          void pendingMovements(userId, spaceId, month).then((queued) => {
-            startTransition(() => {
-              setMovements(queued);
-              setSummary(calculateSummary(queued));
-            });
-          });
-        }
         setError(reason instanceof Error ? reason.message : "Ocurrio un error inesperado.");
-      })
-      .finally(() => {
-        if (current) setLoading(false);
+        // Sin servidor se muestra lo que hay guardado en el aparato, y nada
+        // mas: las cifras del mes anterior con el rotulo de este mentirian.
+        const queued = userId
+          ? await pendingMovements(userId, spaceId, month).catch(() => [] as Movement[])
+          : [];
+        if (!current) return;
+        startTransition(() => {
+          setData({ month, movements: queued, summary: calculateSummary(queued) });
+        });
       });
 
     return () => {
@@ -92,8 +100,17 @@ export function useMonthlyData(
 
   // Cambiar de mes no vacia la pantalla: lo anterior se queda a la vista,
   // atenuado, hasta que llega lo nuevo. Solo la primera carga, cuando no hay
-  // nada que conservar, muestra esqueletos.
-  const stale = loading && movements.length > 0;
+  // nada que conservar, muestra esqueletos. Y refrescar el mes que ya estas
+  // viendo no atenua nada, porque lo que se ve sigue siendo de ese mes.
+  const fresh = data.month === month;
+  const stale = !fresh && data.movements.length > 0;
+  const loading = !fresh && data.movements.length === 0;
 
-  return { summary, movements, loading, stale, error };
+  return {
+    summary: data.summary,
+    movements: data.movements,
+    loading,
+    stale,
+    error
+  };
 }

@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { m, useReducedMotion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import { useDialog } from "../hooks/useDialog";
@@ -8,6 +9,13 @@ import { backdropMotion, popMotion } from "../lib/motion";
  *
  * Quien lo usa lo monta dentro de `AnimatePresence`, asi tambien se anima al
  * cerrarse: sale mas rapido de lo que entra.
+ *
+ * Y se dibuja al final del documento, no donde se escribe. Las pantallas que
+ * lo usan viven dentro del contenedor que se atenua cuando los datos son del
+ * mes anterior, y la opacidad crea un contexto de apilado: dentro de el, el
+ * dialogo se atenuaba con la pantalla y quedaba por debajo de la barra de
+ * navegacion, que esta fuera. Un "esto no se puede deshacer" a media luz y
+ * tapado es justo lo que no puede pasar.
  */
 export function ConfirmDialog({
   title,
@@ -29,7 +37,7 @@ export function ConfirmDialog({
   const dialogRef = useDialog<HTMLElement>(onCancel);
   const reduceMotion = useReducedMotion();
 
-  return (
+  return createPortal(
     <m.div
       className="dialog-backdrop confirm-backdrop"
       role="presentation"
@@ -66,6 +74,7 @@ export function ConfirmDialog({
           </button>
         </div>
       </m.section>
-    </m.div>
+    </m.div>,
+    document.body
   );
 }

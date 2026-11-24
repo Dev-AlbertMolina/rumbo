@@ -26,6 +26,41 @@ import type { FinancePersistence } from "./persistence.js";
 
 interface BuildAppOptions {
   authVerifier?: AuthVerifier;
+  /** Lo que la ruta de salud espera a la base antes de darla por caida. */
+  healthTimeoutMs?: number;
+}
+
+/**
+ * Tres segundos. Una base sana responde `select 1` en milisegundos; una que
+ * tarda mas que esto esta, para lo que importa aqui, caida.
+ */
+const HEALTH_TIMEOUT_MS = 3_000;
+
+/**
+ * Pregunta a la base si esta viva, con plazo propio y sin dejar escapar nada.
+ *
+ * Es la ruta que mira el vigilante diario, y su unico trabajo es contestar.
+ * Una base que rechaza la conexion hace que `ping` lance; una sobrecargada
+ * acepta y no responde nunca. En los dos casos la respuesta correcta es la
+ * misma, y es una respuesta, no un silencio ni un 500 vacio.
+ */
+async function databaseAlive(
+  persistence: FinancePersistence,
+  timeoutMs: number
+): Promise<boolean> {
+  let timer: NodeJS.Timeout | undefined;
+  try {
+    return await Promise.race([
+      Promise.resolve(persistence.ping()),
+      new Promise<boolean>((resolve) => {
+        timer = setTimeout(() => resolve(false), timeoutMs);
+      })
+    ]);
+  } catch {
+    return false;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 export function buildApp(persistence: FinancePersistence, options: BuildAppOptions = {}) {
@@ -73,7 +108,7 @@ export function buildApp(persistence: FinancePersistence, options: BuildAppOptio
   app.get("/health", async () => ({ status: "ok" }));
 
   app.get("/api/health", async (_request, reply) => {
-    const alive = await persistence.ping();
+    const alive = await databaseAlive(persistence, options.healthTimeoutMs ?? HEALTH_TIMEOUT_MS);
     return alive
       ? { status: "ok", database: "ok" }
       : reply.code(503).send({ status: "degraded", database: "down" });

@@ -18,22 +18,15 @@ function movement(id: string, month: string): Movement {
   };
 }
 
-/** Responde a cada mes lo que diga el guion, y avisa cuando le preguntan. */
+/** Responde a cada mes lo que diga el guion. */
 function serverWith(byMonth: Record<string, Movement[]>) {
-  let resolvePending: (() => void) | null = null;
   const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
     const month = String(input).match(/month=([\d-]+)/)?.[1] ?? "";
-    if (resolvePending) await new Promise<void>((resolve) => (resolvePending = resolve));
     return new Response(JSON.stringify(byMonth[month] ?? []), {
       headers: { "Content-Type": "application/json" }
     });
   });
-  return {
-    fetchMock,
-    hold() {
-      resolvePending = () => undefined;
-    }
-  };
+  return { fetchMock };
 }
 
 describe("useMonthlyData", () => {
@@ -114,6 +107,38 @@ describe("useMonthlyData", () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(result.current.movements).toHaveLength(1);
     expect(result.current.stale).toBe(true);
+  });
+
+  it("ningun render muestra el mes viejo como si fuera el nuevo", async () => {
+    // Atenuar no es cuestion de si hay una peticion en marcha, sino de si lo
+    // que se ve pertenece al mes que pediste. Entre que llegan los datos y que
+    // se apaga el indicador cabe un render, y en ese render se leen las cifras
+    // de octubre bajo el rotulo de diciembre, sin atenuar.
+    const { fetchMock } = serverWith({ "2026-10": [movement("octubre", "2026-10")] });
+    vi.spyOn(globalThis, "fetch").mockImplementation(fetchMock);
+
+    const renders: Array<{ asked: string; shown: string[]; stale: boolean }> = [];
+    const { rerender } = renderHook(
+      ({ month }) => {
+        const data = useMonthlyData("token", "espacio", month, 0, "usuario");
+        renders.push({
+          asked: month,
+          shown: data.movements.map((item) => item.effectiveDate.slice(0, 7)),
+          stale: data.stale
+        });
+        return data;
+      },
+      { initialProps: { month: "2026-10" } }
+    );
+    await waitFor(() => expect(renders.at(-1)?.shown).toEqual(["2026-10"]));
+
+    rerender({ month: "2026-12" });
+    await waitFor(() => expect(renders.at(-1)?.shown).toEqual([]));
+
+    const mentirosos = renders.filter(
+      (render) => !render.stale && render.shown.some((shown) => shown !== render.asked)
+    );
+    expect(mentirosos).toEqual([]);
   });
 
   it("suelta los datos al cambiar de usuario", async () => {

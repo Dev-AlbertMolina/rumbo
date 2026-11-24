@@ -1,4 +1,5 @@
 import { dominicanDate } from "@ahorra/domain";
+import { LOAD_FAILED, SERVER_UNREACHABLE, SESSION_EXPIRED } from "./messages";
 
 export function currentMonth(): string {
   return dominicanDate().slice(0, 7);
@@ -15,8 +16,19 @@ export function monthLabel(month: string): string {
   );
 }
 
+/**
+ * Lee el cuerpo de una respuesta, y cuando no hay cuerpo que leer explica por
+ * que con la precision que tenga.
+ *
+ * Que el servidor rechace el token a media sesion y que el servidor este caido
+ * son las dos unicas causas ante las que la persona puede hacer algo: volver a
+ * entrar, o esperar un rato. Taparlas con un mensaje general las vuelve
+ * indistinguibles de un fallo cualquiera.
+ */
 export async function readJson<T>(response: Response): Promise<T> {
-  if (!response.ok) throw new Error("No pudimos cargar la información.");
+  if (response.status === 401 || response.status === 403) throw new Error(SESSION_EXPIRED);
+  if (response.status >= 500) throw new Error(SERVER_UNREACHABLE);
+  if (!response.ok) throw new Error(LOAD_FAILED);
   return response.json() as Promise<T>;
 }
 

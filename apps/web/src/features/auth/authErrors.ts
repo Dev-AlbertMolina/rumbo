@@ -1,7 +1,4 @@
-const UNREACHABLE =
-  "No pudimos conectar con el servidor. Revisa tu conexión e inténtalo en un momento.";
-const EXPIRED = "Tu sesión caducó. Vuelve a entrar.";
-const UNKNOWN = "No pudimos completar la solicitud. Inténtalo de nuevo.";
+import { SERVER_UNREACHABLE, SESSION_EXPIRED, UNEXPECTED } from "../../lib/messages";
 
 /** Un fetch que revienta llega como TypeError; Supabase lo envuelve con su propio nombre. */
 function isUnreachable(error: Error): boolean {
@@ -13,6 +10,18 @@ function isUnreachable(error: Error): boolean {
 }
 
 /**
+ * El estado del servicio, cuando Supabase lo adjunta al error.
+ *
+ * Un proyecto pausado por inactividad no deja la peticion sin respuesta: la
+ * responde, con un error de servicio en ingles. Eso llegaba a la pantalla tal
+ * cual, y mandaba a buscar el fallo donde no estaba.
+ */
+function serverStatus(error: Error): number | undefined {
+  const status = (error as { status?: unknown }).status;
+  return typeof status === "number" ? status : undefined;
+}
+
+/**
  * Traduce un fallo de autenticacion a lo que la persona necesita leer.
  *
  * La distincion que importa es entre "lo que escribiste no sirve" y "el
@@ -20,8 +29,10 @@ function isUnreachable(error: Error): boolean {
  * manda a la gente a cambiarla, y a su dueno a buscar donde no es.
  */
 export function describeAuthError(error: unknown): string {
-  if (!(error instanceof Error)) return UNKNOWN;
-  if (isUnreachable(error)) return UNREACHABLE;
-  if (/jwt|expired|session.*(expired|missing)/i.test(error.message)) return EXPIRED;
-  return error.message || UNKNOWN;
+  if (!(error instanceof Error)) return UNEXPECTED;
+  if (isUnreachable(error)) return SERVER_UNREACHABLE;
+  const status = serverStatus(error);
+  if (status === 0 || (status !== undefined && status >= 500)) return SERVER_UNREACHABLE;
+  if (/jwt|expired|session.*(expired|missing)/i.test(error.message)) return SESSION_EXPIRED;
+  return error.message || UNEXPECTED;
 }

@@ -1,3 +1,5 @@
+import { SERVER_UNREACHABLE } from "./messages";
+
 /**
  * Base absoluta de la API.
  *
@@ -18,13 +20,49 @@ export function resolveApiUrl(input: RequestInfo | URL): RequestInfo | URL {
   return input;
 }
 
+/**
+ * Quince segundos. Una peticion que tarda mas que esto, en una app donde cada
+ * pantalla es una lista corta de movimientos, no va a llegar.
+ */
+export const REQUEST_TIMEOUT_MS = 15_000;
+
+/**
+ * Une el plazo de la peticion con la cancelacion que ya traiga quien llama.
+ *
+ * Las dos tienen que seguir distinguiendose: cancelar es lo que hace un cambio
+ * de mes, y se ignora en silencio; agotar el plazo es un fallo que hay que
+ * contar. En navegadores sin `AbortSignal.any` se conserva la cancelacion, que
+ * es la que evita pintar datos del mes que la persona dejo atras.
+ */
+function withDeadline(signal: AbortSignal | null | undefined, timeoutMs: number) {
+  if (typeof AbortSignal.timeout !== "function") return signal ?? undefined;
+  const deadline = AbortSignal.timeout(timeoutMs);
+  if (!signal) return deadline;
+  if (typeof AbortSignal.any !== "function") return signal;
+  return AbortSignal.any([signal, deadline]);
+}
+
 export async function apiFetch(
   accessToken: string | null | undefined,
   input: RequestInfo | URL,
-  init: RequestInit = {}
+  init: RequestInit & { timeoutMs?: number } = {}
 ): Promise<Response> {
   if (!accessToken) throw new Error("Necesitas iniciar sesión.");
+  const { timeoutMs = REQUEST_TIMEOUT_MS, signal, ...rest } = init;
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bearer ${accessToken}`);
-  return fetch(resolveApiUrl(input), { ...init, headers });
+  try {
+    return await fetch(resolveApiUrl(input), {
+      ...rest,
+      headers,
+      signal: withDeadline(signal, timeoutMs)
+    });
+  } catch (reason: unknown) {
+    // El plazo agotado llega como TimeoutError, en ingles y hablando de
+    // senales. Quien lee la pantalla necesita saber que fue el servidor.
+    if (reason instanceof DOMException && reason.name === "TimeoutError") {
+      throw new Error(SERVER_UNREACHABLE);
+    }
+    throw reason;
+  }
 }
