@@ -87,6 +87,27 @@ Eso convierte la reconstruccion del color de "estaria bien" en "hay que
 hacerlo", y da el criterio: la pareja debe/te deben tiene que separarse por
 tono **y** por luminosidad, no solo por tono.
 
+## El arreglo del color, ya validado
+
+Probado contra el mismo validador hasta que paso:
+
+| Papel | Hoy | Propuesto | Que cambia |
+| --- | --- | --- | --- |
+| Entra / te deben | #267052 | **#3faa78** | Mas claro y mas saturado: deja de leerse gris |
+| Debes / peligro | #b3263e | **#a31f33** | Mas oscuro, para separarse por luminosidad y no solo por tono |
+
+Resultado medido de esa pareja: separacion para daltonismo **18.4**, frente al
+5.5 de hoy y un minimo exigible de 8. A ojo normal, 28.4.
+
+Dos notas que vienen con la propuesta:
+
+- El verde claro sirve para **marcas** (barras, puntos, rellenos), no para
+  texto: da 2.83:1 contra el papel. El texto en verde se queda con un tono
+  oscuro aparte. Es la division normal entre color de dato y color de letra.
+- **Ciruela y terracota no pueden ser dos categorias vecinas** en un grafico:
+  miden 12.8 de separacion a ojo normal, por debajo de 15. Como colores de
+  marca y de gasto van bien; como dos series del mismo grafico, no.
+
 ## Referencias, y una que se rechaza
 
 La base de datos de la skill de UI recomienda para "personal finance tracker":
