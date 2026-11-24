@@ -3,6 +3,7 @@ import { calculateSummary, type Movement, type Summary } from "@ahorra/domain";
 import { apiFetch } from "../lib/api";
 import { readJson } from "../lib/format";
 import { pendingMovements } from "../lib/offline/outbox";
+import { forgetViews } from "../app/viewMemory";
 
 const emptySummary: Summary = {
   incomeCents: 0,
@@ -29,6 +30,7 @@ export function useMonthlyData(
   useEffect(() => {
     setSummary(emptySummary);
     setMovements([]);
+    forgetViews();
   }, [userId]);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { recallScroll, rememberScroll } from "./viewMemory";
 
 export function usePathname() {
   const [pathname, setPathname] = useState(window.location.pathname);
@@ -12,10 +13,14 @@ export function usePathname() {
 
 export function navigate(path: string) {
   if (window.location.pathname === path) return;
+  // Donde estabas se guarda antes de irte, y al volver se restaura: ir a
+  // mirar una cifra a otra seccion ya no cuesta rehacer el camino.
+  rememberScroll(window.location.pathname, window.scrollY);
   window.history.pushState({}, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
+  const top = recallScroll(path);
+  document.documentElement.scrollTop = top;
+  document.body.scrollTop = top;
 }
 
 export function RouteLink({

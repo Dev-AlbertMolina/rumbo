@@ -5,6 +5,7 @@ import { IllustratedEmptyState } from "../../components/IllustratedEmptyState";
 import { PageTitle } from "../../components/PageTitle";
 import { StatusPill } from "../../components/StatusPill";
 import { today } from "../../lib/format";
+import { recallFilters, rememberFilters } from "../../app/viewMemory";
 import { MovementBadges } from "./MovementBadges";
 import { MovementCardList } from "./MovementCardList";
 
@@ -24,12 +25,22 @@ export function MovementsPage({
   recurrencesSlot?: ReactNode;
 }) {
   const pageSize = 15;
-  const [query, setQuery] = useState("");
-  const [type, setType] = useState("ALL");
-  const [status, setStatus] = useState("ALL");
-  const [period, setPeriod] = useState("ALL");
-  const [rangeFrom, setRangeFrom] = useState("");
-  const [rangeTo, setRangeTo] = useState("");
+  // Los filtros se recuerdan mientras dure la sesion: volver a Movimientos
+  // no deberia borrar lo que estabas mirando.
+  const saved = recallFilters("/movimientos", {
+    query: "",
+    type: "ALL",
+    status: "ALL",
+    period: "ALL",
+    rangeFrom: "",
+    rangeTo: ""
+  });
+  const [query, setQuery] = useState(saved.query);
+  const [type, setType] = useState(saved.type);
+  const [status, setStatus] = useState(saved.status);
+  const [period, setPeriod] = useState(saved.period);
+  const [rangeFrom, setRangeFrom] = useState(saved.rangeFrom);
+  const [rangeTo, setRangeTo] = useState(saved.rangeTo);
   const [page, setPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -81,6 +92,9 @@ export function MovementsPage({
   const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   useEffect(() => setPage(1), [query, type, status, period, rangeFrom, rangeTo]);
+  useEffect(() => {
+    rememberFilters("/movimientos", { query, type, status, period, rangeFrom, rangeTo });
+  }, [query, type, status, period, rangeFrom, rangeTo]);
   useEffect(() => setPage((value) => Math.min(value, totalPages)), [totalPages]);
 
   const periodLabels: Record<string, string> = {
