@@ -26,6 +26,10 @@ import type { FinancePersistence } from "./persistence.js";
 
 interface BuildAppOptions {
   authVerifier?: AuthVerifier;
+  /** Tope de peticiones. Las pruebas lo bajan para no tardar un minuto. */
+  rateLimit?: { max: number; timeWindow: number };
+  /** Si corre en produccion. Por defecto lo dice NODE_ENV. */
+  production?: boolean;
   /** Lo que la ruta de salud espera a la base antes de darla por caida. */
   healthTimeoutMs?: number;
 }
@@ -71,15 +75,62 @@ export function buildApp(persistence: FinancePersistence, options: BuildAppOptio
   // http://localhost y iOS desde capacitor://localhost. Van siempre permitidos
   // porque no son configurables por despliegue.
   const nativeOrigins = ["http://localhost", "https://localhost", "capacitor://localhost"];
-  const allowedOrigins = [
-    ...(process.env.CORS_ORIGIN?.split(",").map((origin) => origin.trim()) ?? [
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-      "http://127.0.0.1:4173"
-    ]),
-    ...nativeOrigins
-  ];
+  // Los de desarrollo solo fuera de produccion: alla no hay nadie trabajando
+  // en localhost, y dejarlos abiertos es una puerta que no hace falta tener.
+  const isProduction = options.production ?? process.env.NODE_ENV === "production";
+  const developmentOrigins = isProduction
+    ? []
+    : ["http://localhost:5173", "http://127.0.0.1:5173", "http://127.0.0.1:4173"];
+  const configuredOrigins =
+    process.env.CORS_ORIGIN?.split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean) ?? [];
+  const allowedOrigins = [...configuredOrigins, ...developmentOrigins, ...nativeOrigins];
   app.register(cors, { origin: allowedOrigins });
+
+  /**
+   * Un tope de peticiones por sesion, y por direccion cuando no hay sesion.
+   *
+   * La API corre sin servidor: cada peticion se paga y abre conexion contra la
+   * base. Doscientas por minuto son muchas mas de las que hace nadie usando la
+   * app —una pantalla pide cinco o seis— y pocas para un bucle desbocado.
+   *
+   * Escrito a mano y no con un complemento porque el almacen tendria que ser
+   * en memoria igual: cada instancia sin servidor tiene la suya, asi que esto
+   * frena lo tonto —un bucle, un script torpe— y no pretende mas.
+   *
+   * La clave es el token y no el usuario ya verificado porque esto corre
+   * antes de verificar; dos pestanas de la misma persona comparten cubo, que
+   * es justo lo que se quiere.
+   */
+  const buckets = new Map<string, { count: number; resetAt: number }>();
+  const maxRequests = options.rateLimit?.max ?? 200;
+  const windowMs = options.rateLimit?.timeWindow ?? 60_000;
+
+  app.addHook("onRequest", async (request, reply) => {
+    const key = request.headers.authorization ?? request.ip;
+    const now = Date.now();
+    const bucket = buckets.get(key);
+
+    if (!bucket || bucket.resetAt <= now) {
+      buckets.set(key, { count: 1, resetAt: now + windowMs });
+      // Que el mapa no crezca sin fin en una instancia de vida larga.
+      if (buckets.size > 5_000) {
+        for (const [otherKey, other] of buckets) if (other.resetAt <= now) buckets.delete(otherKey);
+      }
+      return;
+    }
+
+    bucket.count += 1;
+    if (bucket.count > maxRequests) {
+      return reply
+        .code(429)
+        .header("Retry-After", Math.ceil((bucket.resetAt - now) / 1000))
+        .send({
+          message: "Demasiadas peticiones seguidas. Espera un momento y vuelve a intentarlo."
+        });
+    }
+  });
 
   app.addHook("preHandler", async (request, reply) => {
     // La salud va por /api/ porque vercel.json solo reescribe eso, pero no
