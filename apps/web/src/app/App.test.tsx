@@ -4,8 +4,23 @@
 import "fake-indexeddb/auto";
 import "@testing-library/jest-dom/vitest";
 import { formatDop } from "@ahorra/domain";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import {
+  cleanup,
+  configure,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+// Las pantallas se cargan al entrar en ellas, asi que estas pruebas esperan
+// ademas a que llegue su trozo de codigo. El segundo que trae de fabrica
+// `findBy*` alcanza con la maquina libre, pero no cuando corre toda la suite
+// a la vez: fallaba una de cada varias ejecuciones, y una prueba que falla
+// sola no avisa de nada, estorba.
+configure({ asyncUtilTimeout: 5_000 });
 
 vi.mock("../features/auth/AuthProvider", () => ({
   useAuth: () => ({

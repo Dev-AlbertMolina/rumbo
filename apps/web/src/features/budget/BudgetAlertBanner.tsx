@@ -1,5 +1,5 @@
 import { calculateBudgetAlerts, formatDop, type BudgetLimit, type Summary } from "@ahorra/domain";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "../../components/icons";
 import { navigate } from "../../app/router";
 
 /**

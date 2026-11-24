@@ -1,4 +1,4 @@
-import { CloudOff, RefreshCw, WifiOff } from "lucide-react";
+import { CloudOff, RefreshCw, WifiOff } from "./icons";
 
 /**
  * Estado de lo registrado sin conexion.
@@ -40,7 +40,7 @@ export function OfflineBanner({
       {online && pending > 0 && (
         <div className="button-row">
           <button className="secondary" onClick={onSync}>
-            <RefreshCw size={16} /> Subir ahora
+            <RefreshCw size={18} /> Subir ahora
           </button>
         </div>
       )}

@@ -18,7 +18,7 @@ import {
   Trash2,
   TrendingDown,
   TrendingUp
-} from "lucide-react";
+} from "../../components/icons";
 import { AnimatePresence, m } from "framer-motion";
 import { OptionCards, type OptionCard } from "../../components/OptionCards";
 import { type FormEvent, useState } from "react";
@@ -234,7 +234,7 @@ export function RecurrencesPanel({
         </button>
         {expanded && (
           <button className="secondary" onClick={startCreate}>
-            <Plus size={16} /> Nueva recurrencia
+            <Plus size={18} /> Nueva recurrencia
           </button>
         )}
       </header>
@@ -266,7 +266,7 @@ export function RecurrencesPanel({
                 lo desligaba del icono.
               */}
                     <span className={`movement-icon ${rule.type.toLowerCase()}`}>
-                      {rule.type === "CONTRIBUTION" ? <Target size={16} /> : <Repeat size={16} />}
+                      {rule.type === "CONTRIBUTION" ? <Target size={18} /> : <Repeat size={18} />}
                     </span>
                     <div className="recurrence-text">
                       <strong className="recurrence-name">{rule.description}</strong>
@@ -292,7 +292,7 @@ export function RecurrencesPanel({
                           aria-label={`${rule.active ? "Pausar" : "Reanudar"} ${rule.description}`}
                           onClick={() => void toggleActive(rule)}
                         >
-                          {rule.active ? <Pause size={16} /> : <Play size={16} />}
+                          {rule.active ? <Pause size={18} /> : <Play size={18} />}
                         </button>
                         <button
                           className="table-action"
@@ -300,7 +300,7 @@ export function RecurrencesPanel({
                           aria-label={`Editar ${rule.description}`}
                           onClick={() => startEdit(rule)}
                         >
-                          <Pencil size={16} />
+                          <Pencil size={18} />
                         </button>
                       </div>
                     </div>
@@ -455,7 +455,7 @@ export function RecurrencesPanel({
                           className="text-button danger-text recurrence-delete"
                           onClick={() => setPendingDelete(editing)}
                         >
-                          <Trash2 size={15} aria-hidden="true" /> Eliminar
+                          <Trash2 size={18} aria-hidden="true" /> Eliminar
                         </button>
                       )}
                       <button type="button" className="secondary" onClick={() => setOpen(false)}>

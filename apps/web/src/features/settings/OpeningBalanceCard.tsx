@@ -1,5 +1,5 @@
 import { formatDop, type Balance } from "@ahorra/domain";
-import { Landmark } from "lucide-react";
+import { Landmark } from "../../components/icons";
 import { type FormEvent, useEffect, useState } from "react";
 import { MoneyInput } from "../../components/MoneyInput";
 import { apiFetch } from "../../lib/api";
@@ -61,7 +61,7 @@ export function OpeningBalanceCard({
         </div>
         {!editing && (
           <button className="secondary" onClick={() => setEditing(true)}>
-            <Landmark size={16} /> Ajustar
+            <Landmark size={18} /> Ajustar
           </button>
         )}
       </header>

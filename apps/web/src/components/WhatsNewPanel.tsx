@@ -1,5 +1,5 @@
 import { m, useReducedMotion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles } from "./icons";
 import { navigate } from "../app/router";
 import { LATEST_RELEASE } from "../features/whatsnew/releases";
 import { useDialog } from "../hooks/useDialog";
@@ -33,7 +33,7 @@ export function WhatsNewPanel({ onClose }: { onClose: () => void }) {
         {...popMotion(reduceMotion)}
       >
         <span className="whats-new-icon" aria-hidden="true">
-          <Sparkles size={22} />
+          <Sparkles size={24} />
         </span>
         <h2 id="whats-new-title">Novedades en Rumbo</h2>
         <p className="muted">

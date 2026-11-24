@@ -1,5 +1,5 @@
 import { formatDop, type Goal, type GoalContribution } from "@ahorra/domain";
-import { Pencil, PartyPopper, PiggyBank, Plus } from "lucide-react";
+import { Pencil, PartyPopper, PiggyBank, Plus } from "../../components/icons";
 import { type FormEvent, useState } from "react";
 import { IllustratedEmptyState } from "../../components/IllustratedEmptyState";
 import { MoneyInput } from "../../components/MoneyInput";
@@ -219,7 +219,7 @@ export function GoalsPage({
               <article className="panel goal-card" key={goal.id}>
                 {celebratingGoalId === goal.id && (
                   <div className="goal-celebration" role="status">
-                    <PartyPopper size={28} />
+                    <PartyPopper size={24} />
                     <strong>Meta completada</strong>
                   </div>
                 )}
@@ -285,7 +285,7 @@ export function GoalsPage({
                   <div className="goal-actions">
                     {goal.status !== "COMPLETED" && (
                       <button className="primary" onClick={() => setContributingTo(goal.id)}>
-                        <PiggyBank size={16} /> Registrar aporte
+                        <PiggyBank size={18} /> Registrar aporte
                       </button>
                     )}
                     <button className="secondary" onClick={() => void toggleContributions(goal.id)}>
@@ -350,7 +350,7 @@ export function GoalsPage({
                                 onClick={() => beginContributionEdit(item)}
                                 title="Editar"
                               >
-                                <Pencil size={16} />
+                                <Pencil size={18} />
                               </button>
                             </>
                           )}

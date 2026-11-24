@@ -22,7 +22,14 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["apps/api/src/**/*.ts", "scripts/**/*.mjs", "*.mjs", "*.js"],
+    files: [
+      "apps/api/src/**/*.ts",
+      "scripts/**/*.mjs",
+      // Los generadores de la web tambien corren en Node, no en el navegador.
+      "apps/*/scripts/**/*.mjs",
+      "*.mjs",
+      "*.js"
+    ],
     languageOptions: {
       globals: { ...globals.node }
     }

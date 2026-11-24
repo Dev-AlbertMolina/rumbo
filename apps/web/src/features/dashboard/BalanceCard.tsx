@@ -1,5 +1,5 @@
 import { formatDop, type Balance } from "@ahorra/domain";
-import { Landmark, Lock, Wallet } from "lucide-react";
+import { Landmark, Lock, Wallet } from "../../components/icons";
 
 /**
  * Cuanto dinero hay en el espacio, contando toda su historia.
@@ -21,20 +21,20 @@ export function BalanceCard({ balance }: { balance: Balance }) {
       </header>
       <div className="balance-total">
         <span className="balance-icon" aria-hidden="true">
-          <Landmark size={20} />
+          <Landmark size={24} />
         </span>
         <strong className={negative ? "danger-text" : ""}>{formatDop(balance.totalCents)}</strong>
       </div>
       <div className="balance-split">
         <div>
           <span>
-            <Lock size={14} aria-hidden="true" /> Apartado en metas
+            <Lock size={18} aria-hidden="true" /> Apartado en metas
           </span>
           <strong>{formatDop(balance.earmarkedCents)}</strong>
         </div>
         <div>
           <span>
-            <Wallet size={14} aria-hidden="true" /> Libre
+            <Wallet size={18} aria-hidden="true" /> Libre
           </span>
           <strong className={balance.freeCents < 0 ? "danger-text" : ""}>
             {formatDop(balance.freeCents)}

@@ -5,7 +5,7 @@ import {
   type ExpenseCategory,
   type Summary
 } from "@ahorra/domain";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "../../components/icons";
 import { AnimatePresence } from "framer-motion";
 import { type FormEvent, useEffect, useState } from "react";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
@@ -183,7 +183,7 @@ export function BudgetPage({
         action={
           <div className="button-row">
             <button className="secondary" onClick={() => setAddingCategory(true)}>
-              <Plus size={16} /> Nueva categoría
+              <Plus size={18} /> Nueva categoría
             </button>
             <button className="primary" onClick={() => void saveBudget()} disabled={saving}>
               {saving ? "Guardando..." : "Guardar presupuesto"}
@@ -292,7 +292,7 @@ export function BudgetPage({
                             onClick={() => startEdit(customCat)}
                             title="Editar"
                           >
-                            <Pencil size={16} />
+                            <Pencil size={18} />
                           </button>
                           <button
                             className="table-action danger"
@@ -300,7 +300,7 @@ export function BudgetPage({
                             disabled={deletingId === customCat.id}
                             title="Eliminar"
                           >
-                            {deletingId === customCat.id ? "..." : <Trash2 size={16} />}
+                            {deletingId === customCat.id ? "..." : <Trash2 size={18} />}
                           </button>
                         </div>
                       )}

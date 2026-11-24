@@ -1,4 +1,5 @@
-import { CheckCircle2, CircleDot, Clock, PauseCircle } from "lucide-react";
+import { CheckCircle2, CircleDot, Clock, PauseCircle } from "./icons";
+import { ICON_TEXT } from "./icons";
 
 export type StatusPillTone = "registered" | "scheduled" | "active" | "paused" | "completed";
 
@@ -14,7 +15,7 @@ export function StatusPill({ tone, label }: { tone: StatusPillTone; label: strin
   const Icon = ICONS[tone];
   return (
     <span className={`status-pill ${tone}`}>
-      <Icon size={12} aria-hidden="true" />
+      <Icon size={ICON_TEXT} aria-hidden="true" />
       {label}
     </span>
   );

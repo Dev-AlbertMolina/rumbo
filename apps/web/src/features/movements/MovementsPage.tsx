@@ -1,5 +1,5 @@
 import { formatDop, type Movement, type MovementType } from "@ahorra/domain";
-import { Pencil, SlidersHorizontal, TrendingDown, TrendingUp } from "lucide-react";
+import { Pencil, SlidersHorizontal, TrendingDown, TrendingUp } from "../../components/icons";
 import { useEffect, useState, type ReactNode } from "react";
 import { IllustratedEmptyState } from "../../components/IllustratedEmptyState";
 import { PageTitle } from "../../components/PageTitle";
@@ -124,10 +124,10 @@ export function MovementsPage({
         action={
           <div className="button-row">
             <button className="secondary" onClick={() => onAdd("INCOME")}>
-              <TrendingUp size={16} /> Ingreso
+              <TrendingUp size={18} /> Ingreso
             </button>
             <button className="primary" onClick={() => onAdd("EXPENSE")}>
-              <TrendingDown size={16} /> Gasto
+              <TrendingDown size={18} /> Gasto
             </button>
           </div>
         }
@@ -173,7 +173,7 @@ export function MovementsPage({
               aria-expanded={filtersOpen}
               onClick={() => setFiltersOpen((open) => !open)}
             >
-              <SlidersHorizontal size={16} aria-hidden="true" />
+              <SlidersHorizontal size={18} aria-hidden="true" />
               Filtros
               {activeFilterCount > 0 && <span className="filters-count">{activeFilterCount}</span>}
             </button>
@@ -305,7 +305,7 @@ export function MovementsPage({
                               onClick={() => onEdit(movement)}
                               title="Editar"
                             >
-                              <Pencil size={16} />
+                              <Pencil size={18} />
                             </button>
                           )}
                         </td>

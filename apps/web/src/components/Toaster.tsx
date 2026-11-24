@@ -1,5 +1,5 @@
 import { AnimatePresence, m, useReducedMotion, type PanInfo } from "framer-motion";
-import { AlertTriangle, CircleCheck, CloudOff } from "lucide-react";
+import { AlertTriangle, CircleCheck, CloudOff } from "./icons";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { DURATION, EASE_OUT } from "../lib/motion";
 

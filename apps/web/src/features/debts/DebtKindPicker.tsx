@@ -1,5 +1,5 @@
 import type { DebtKind } from "@ahorra/domain";
-import { HandCoins, Handshake, Users } from "lucide-react";
+import { HandCoins, Handshake, Users } from "../../components/icons";
 import { OptionCards, type OptionCard } from "../../components/OptionCards";
 
 export const KIND_ICONS: Record<DebtKind, typeof HandCoins> = {

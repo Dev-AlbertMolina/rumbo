@@ -1,4 +1,4 @@
-import { Camera, Loader2, Trash2 } from "lucide-react";
+import { Camera, Loader2, Trash2 } from "./icons";
 import { useEffect, useRef, useState } from "react";
 import { deleteReceipt, receiptUrl, uploadReceipt } from "../lib/receipts";
 
@@ -82,7 +82,7 @@ export function ReceiptField({
             <span className="receipt-loading">Cargando...</span>
           )}
           <button type="button" className="table-action danger" onClick={() => void clear()}>
-            <Trash2 size={16} />
+            <Trash2 size={18} />
           </button>
         </div>
       ) : (
@@ -94,11 +94,11 @@ export function ReceiptField({
         >
           {uploading ? (
             <>
-              <Loader2 size={16} className="spin" /> Subiendo...
+              <Loader2 size={18} className="spin" /> Subiendo...
             </>
           ) : (
             <>
-              <Camera size={16} /> Tomar o elegir foto
+              <Camera size={18} /> Tomar o elegir foto
             </>
           )}
         </button>

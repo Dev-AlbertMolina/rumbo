@@ -1,5 +1,5 @@
 import { formatDop, type BudgetCategoryAlert } from "@ahorra/domain";
-import { AlertTriangle, Gauge } from "lucide-react";
+import { AlertTriangle, Gauge } from "../../components/icons";
 import type { MonthElapsed } from "../../lib/format";
 
 /**
@@ -51,15 +51,15 @@ export function BudgetUsage({
       </div>
       {level === "OVER" ? (
         <p className="budget-flag over">
-          <AlertTriangle size={14} aria-hidden="true" /> Te pasaste del límite
+          <AlertTriangle size={18} aria-hidden="true" /> Te pasaste del límite
         </p>
       ) : level === "NEAR" ? (
         <p className="budget-flag near">
-          <AlertTriangle size={14} aria-hidden="true" /> Ya usaste el {percent}% del límite
+          <AlertTriangle size={18} aria-hidden="true" /> Ya usaste el {percent}% del límite
         </p>
       ) : ahead ? (
         <p className="budget-flag pace">
-          <Gauge size={14} aria-hidden="true" /> Vas adelantado: llevas el {percent}% con el{" "}
+          <Gauge size={18} aria-hidden="true" /> Vas adelantado: llevas el {percent}% con el{" "}
           {monthPercent}% del mes
         </p>
       ) : null}

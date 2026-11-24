@@ -1,4 +1,4 @@
-import { MapPin, Sparkles } from "lucide-react";
+import { MapPin, Sparkles } from "../../components/icons";
 import { useState } from "react";
 import { PageTitle } from "../../components/PageTitle";
 import { PreviewFrame } from "./PreviewFrame";
@@ -39,7 +39,7 @@ export function WhatsNewPage() {
                 onClick={() => setOpenVersion(open ? "" : release.version)}
               >
                 <span className="release-badge" aria-hidden="true">
-                  <Sparkles size={16} />
+                  <Sparkles size={18} />
                 </span>
                 <span className="release-heading">
                   <span className="release-meta">
@@ -67,7 +67,7 @@ export function WhatsNewPage() {
                           <p>{entry.description}</p>
                           {entry.where && (
                             <p className="release-where">
-                              <MapPin size={14} aria-hidden="true" /> {entry.where}
+                              <MapPin size={18} aria-hidden="true" /> {entry.where}
                             </p>
                           )}
                         </div>

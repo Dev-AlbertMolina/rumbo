@@ -1,5 +1,5 @@
 import { AnimatePresence, m, useReducedMotion } from "framer-motion";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown, Sparkles } from "../icons";
 import { useEffect, useRef, useState } from "react";
 import { navigate } from "../../app/router";
 import { getUserInitial, getUserName } from "../../lib/format";
@@ -84,7 +84,7 @@ export function UserMenu({
         </div>
         <ChevronDown
           className={`chevron-icon ${open ? "open" : ""}`}
-          size={14}
+          size={18}
           aria-hidden="true"
         />
       </button>
@@ -123,7 +123,7 @@ export function UserMenu({
               }}
               role="menuitem"
             >
-              <Sparkles size={16} />
+              <Sparkles size={18} />
               <span>Novedades</span>
             </button>
             <button

@@ -1,5 +1,5 @@
 import { calculateGoalPace, formatDop, type Goal } from "@ahorra/domain";
-import { AlertTriangle, CalendarX, TrendingUp } from "lucide-react";
+import { AlertTriangle, CalendarX, TrendingUp } from "../../components/icons";
 import { today } from "../../lib/format";
 
 /**
@@ -17,7 +17,7 @@ export function GoalPaceNote({ goal }: { goal: Goal }) {
   if (pace.status === "OVERDUE") {
     return (
       <p className="goal-pace overdue">
-        <CalendarX size={16} aria-hidden="true" />
+        <CalendarX size={18} aria-hidden="true" />
         <span>
           La fecha ya pasó y faltan <strong>{formatDop(pace.remainingCents)}</strong>. Ajusta la
           fecha o el monto.
@@ -32,9 +32,9 @@ export function GoalPaceNote({ goal }: { goal: Goal }) {
   return (
     <p className={`goal-pace ${behind ? "behind" : "on-track"}`}>
       {behind ? (
-        <AlertTriangle size={16} aria-hidden="true" />
+        <AlertTriangle size={18} aria-hidden="true" />
       ) : (
-        <TrendingUp size={16} aria-hidden="true" />
+        <TrendingUp size={18} aria-hidden="true" />
       )}
       <span>
         Aparta <strong>{formatDop(pace.monthlyTargetCents!)}</strong> al mes durante{" "}

@@ -1,6 +1,6 @@
 import { formatDop, type MovementType, type Movement } from "@ahorra/domain";
 import { AnimatePresence } from "framer-motion";
-import { AlertTriangle, Plus } from "lucide-react";
+import { AlertTriangle, Plus } from "../components/icons";
 import { lazy, Suspense, useState } from "react";
 import { useAuth } from "../features/auth/AuthProvider";
 import { BalanceBridge } from "../components/BalanceBridge";
@@ -370,7 +370,7 @@ export default function App() {
           aria-label="Agregar movimiento"
           onClick={() => openForm("EXPENSE")}
         >
-          <Plus size={26} />
+          <Plus size={24} />
         </button>
         <BottomNav pathname={pathname} />
 

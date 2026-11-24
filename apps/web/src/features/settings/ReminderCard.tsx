@@ -1,4 +1,4 @@
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff } from "../../components/icons";
 import { useState } from "react";
 import {
   notificationsSupported,
@@ -37,7 +37,7 @@ export function ReminderCard({
       <section className="panel settings-card">
         <p className="eyebrow">Recordatorios</p>
         <h2>
-          <BellOff size={20} /> No disponibles aquí
+          <BellOff size={24} /> No disponibles aquí
         </h2>
         <p className="settings-hint">
           Este navegador no permite notificaciones. En la app de Android si funcionan.
@@ -96,7 +96,7 @@ export function ReminderCard({
                 onClick={() => showReminder(0)}
                 disabled={state !== "granted"}
               >
-                <Bell size={16} /> Probar ahora
+                <Bell size={18} /> Probar ahora
               </button>
             </>
           )}

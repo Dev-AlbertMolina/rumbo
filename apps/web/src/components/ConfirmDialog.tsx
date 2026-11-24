@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 import { m, useReducedMotion } from "framer-motion";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "./icons";
 import { useDialog } from "../hooks/useDialog";
 import { backdropMotion, popMotion } from "../lib/motion";
 
@@ -56,7 +56,7 @@ export function ConfirmDialog({
       >
         {danger && (
           <span className="confirm-dialog-icon" aria-hidden="true">
-            <AlertTriangle size={20} />
+            <AlertTriangle size={24} />
           </span>
         )}
         <h2 id="confirm-dialog-title">{title}</h2>

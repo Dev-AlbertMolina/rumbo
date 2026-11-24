@@ -6,7 +6,7 @@ import {
   type HTMLMotionProps,
   type PanInfo
 } from "framer-motion";
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "../../components/icons";
 import { type FormEvent, useState } from "react";
 import { MoneyInput } from "../../components/MoneyInput";
 import { ReceiptField } from "../../components/ReceiptField";
@@ -198,14 +198,14 @@ export function MovementDialog({
               className={type === "EXPENSE" ? "active" : ""}
               onClick={() => changeType("EXPENSE")}
             >
-              <TrendingDown size={16} /> Gasto
+              <TrendingDown size={18} /> Gasto
             </button>
             <button
               type="button"
               className={type === "INCOME" ? "active" : ""}
               onClick={() => changeType("INCOME")}
             >
-              <TrendingUp size={16} /> Ingreso
+              <TrendingUp size={18} /> Ingreso
             </button>
           </div>
           <label>

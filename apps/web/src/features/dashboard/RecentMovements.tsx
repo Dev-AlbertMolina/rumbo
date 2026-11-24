@@ -1,5 +1,5 @@
 import { formatDop, type Movement } from "@ahorra/domain";
-import { Gem, Pencil, TrendingDown, TrendingUp } from "lucide-react";
+import { Gem, Pencil, TrendingDown, TrendingUp } from "../../components/icons";
 
 export function RecentMovements({
   movements,
@@ -26,11 +26,11 @@ export function RecentMovements({
           <article key={movement.id} className="movement-row">
             <span className={`movement-icon ${movement.type.toLowerCase()}`}>
               {movement.type === "INCOME" ? (
-                <TrendingUp size={16} />
+                <TrendingUp size={18} />
               ) : movement.type === "EXPENSE" ? (
-                <TrendingDown size={16} />
+                <TrendingDown size={18} />
               ) : (
-                <Gem size={16} />
+                <Gem size={18} />
               )}
             </span>
             <div>
@@ -54,7 +54,7 @@ export function RecentMovements({
                   title="Editar"
                   onClick={() => onEdit(movement)}
                 >
-                  <Pencil size={16} />
+                  <Pencil size={18} />
                 </button>
               )}
             </div>

@@ -1,5 +1,6 @@
 import type { Movement } from "@ahorra/domain";
-import { CloudOff, Paperclip, Repeat } from "lucide-react";
+import { ICON_TEXT } from "../../components/icons";
+import { CloudOff, Paperclip, Repeat } from "../../components/icons";
 import { isPendingMovement } from "../../lib/offline/outbox";
 
 /**
@@ -57,7 +58,7 @@ export function MovementBadges({
           title={title}
           aria-label={compact ? label : undefined}
         >
-          <Icon size={12} aria-hidden="true" />
+          <Icon size={ICON_TEXT} aria-hidden="true" />
           {!compact && label}
         </span>
       ))}

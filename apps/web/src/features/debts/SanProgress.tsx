@@ -1,5 +1,5 @@
 import { formatDop, type Debt, type DebtProgress } from "@ahorra/domain";
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight } from "../../components/icons";
 
 /**
  * El estado de un san contado como lo cuenta quien esta dentro.
@@ -41,9 +41,9 @@ export function SanProgress({ debt, progress }: { debt: Debt; progress: DebtProg
 
       <p className={`san-net ${lending ? "lending" : "owing"}`}>
         {lending ? (
-          <ArrowUpRight size={16} aria-hidden="true" />
+          <ArrowUpRight size={18} aria-hidden="true" />
         ) : (
-          <ArrowDownLeft size={16} aria-hidden="true" />
+          <ArrowDownLeft size={18} aria-hidden="true" />
         )}
         <span>
           {lending ? (

@@ -7,7 +7,7 @@ import {
   Tag,
   UtensilsCrossed,
   Zap
-} from "lucide-react";
+} from "../components/icons";
 import type { ComponentType } from "react";
 
 const CATEGORY_ICONS: Record<string, ComponentType<{ size?: number }>> = {

@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from "react";
 import { PageTitle } from "../../components/PageTitle";
-import { Briefcase, CalendarDays, Clock, Coins, Pencil, ShieldCheck, User } from "lucide-react";
+import { Briefcase, CalendarDays, Clock, Coins, Pencil, ShieldCheck, User } from "../../components/icons";
 import { StatusPill } from "../../components/StatusPill";
 import { supabase } from "../../lib/supabase";
 import { getUserName } from "../../lib/format";
@@ -82,7 +82,7 @@ export function SettingsPage({
                       }}
                       title="Editar"
                     >
-                      <Pencil size={16} />
+                      <Pencil size={18} />
                     </button>
                   </div>
                 ) : (
@@ -143,19 +143,19 @@ export function SettingsPage({
           <dl className="settings-definition">
             <div>
               <dt>
-                <Coins size={16} /> Moneda
+                <Coins size={18} /> Moneda
               </dt>
               <dd>DOP · Peso dominicano</dd>
             </div>
             <div>
               <dt>
-                <Clock size={16} /> Zona horaria
+                <Clock size={18} /> Zona horaria
               </dt>
               <dd>America/Santo_Domingo</dd>
             </div>
             <div>
               <dt>
-                <CalendarDays size={16} /> Formato de fecha
+                <CalendarDays size={18} /> Formato de fecha
               </dt>
               <dd>DD/MM/AAAA</dd>
             </div>
@@ -172,7 +172,7 @@ export function SettingsPage({
         <section className="panel privacy-card">
           <p className="eyebrow">Privacidad</p>
           <h2>
-            <ShieldCheck size={22} /> Tus registros son manuales
+            <ShieldCheck size={24} /> Tus registros son manuales
           </h2>
           <p>Rumbo no está conectado a tus cuentas bancarias y no mueve dinero.</p>
         </section>

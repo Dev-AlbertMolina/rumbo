@@ -8,7 +8,8 @@
     "build:native": "tsc -b && vite build --mode native",
     "dev": "vite",
     "test": "vitest run",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "iconos": "node scripts/generar-iconos.mjs"
   },
   "dependencies": {
     "@ahorra/domain": "*",
@@ -17,11 +18,11 @@
     "@supabase/supabase-js": "^2.57.4",
     "dexie": "^4.2.1",
     "framer-motion": "^13.3.0",
-    "lucide-react": "^1.31.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@phosphor-icons/core": "^2.1.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@types/react": "^19.2.2",

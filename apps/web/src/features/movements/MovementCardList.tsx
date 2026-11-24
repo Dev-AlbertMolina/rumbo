@@ -1,5 +1,6 @@
 import { formatDop, type Movement } from "@ahorra/domain";
-import { Gem, Pencil, TrendingDown, TrendingUp } from "lucide-react";
+import { ICON_TEXT } from "../../components/icons";
+import { Gem, Pencil, TrendingDown, TrendingUp } from "../../components/icons";
 import { MovementBadges } from "./MovementBadges";
 
 const TYPE_ICONS = {
@@ -37,7 +38,7 @@ export function MovementCardList({
         return (
           <article className="movement-card" key={movement.id}>
             <span className={`movement-icon ${movement.type.toLowerCase()}`}>
-              <Icon size={16} />
+              <Icon size={ICON_TEXT} />
             </span>
 
             <div className="movement-card-main">
@@ -62,7 +63,7 @@ export function MovementCardList({
                     title="Editar"
                     aria-label={`Editar ${movement.description}`}
                   >
-                    <Pencil size={16} />
+                    <Pencil size={18} />
                   </button>
                 )}
               </div>

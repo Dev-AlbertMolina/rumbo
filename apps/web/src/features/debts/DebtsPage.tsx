@@ -6,7 +6,7 @@ import {
   type DebtKind
 } from "@ahorra/domain";
 import { AnimatePresence } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "../../components/icons";
 import { type FormEvent, useState } from "react";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { IllustratedEmptyState } from "../../components/IllustratedEmptyState";
@@ -292,7 +292,7 @@ export function DebtsPage({
                     aria-label={`Eliminar ${debt.name}`}
                     onClick={() => setPendingDelete(debt)}
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={18} />
                   </button>
                 </div>
 
@@ -378,7 +378,7 @@ export function DebtsPage({
                         setPayment(debt.kind === "SAN" ? String(debt.installmentCents / 100) : "");
                       }}
                     >
-                      <Plus size={15} aria-hidden="true" />
+                      <Plus size={18} aria-hidden="true" />
                       {debt.kind === "LOAN"
                         ? "Registrar cobro"
                         : debt.kind === "SAN"

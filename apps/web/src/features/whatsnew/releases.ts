@@ -45,7 +45,7 @@ export const RELEASES: Release[] = [
         title: "Abre más rápido en el teléfono",
         hasPreview: true,
         description:
-          "Antes el teléfono descargaba la app entera —todas las pantallas— antes de enseñarte nada, aunque solo fueras a anotar un gasto. Ahora la primera pantalla no espera a las demás: pesa un 20% menos y Deudas, Reportes o Metas llegan por su cuenta, después, para estar listas cuando entres. Y el panel para registrar un movimiento abre con menos tirón la primera vez de cada sesión: resultó ser el desenfoque del fondo, y quitarlo bajó esa primera apertura de 146 a 83 milésimas. Las siguientes ya iban rápidas antes.",
+          "Antes el teléfono descargaba la app entera —todas las pantallas— antes de enseñarte nada, aunque solo fueras a anotar un gasto. Ahora la primera pantalla no espera a las demás: pesa un 17% menos y Deudas, Reportes o Metas llegan por su cuenta, después, para estar listas cuando entres. Y el panel para registrar un movimiento abre con menos tirón la primera vez de cada sesión: resultó ser el desenfoque del fondo, y quitarlo bajó esa primera apertura de 146 a 83 milésimas. Las siguientes ya iban rápidas antes.",
         where: "En toda la app"
       },
       {

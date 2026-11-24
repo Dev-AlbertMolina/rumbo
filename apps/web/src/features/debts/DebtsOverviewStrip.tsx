@@ -1,5 +1,6 @@
 import { formatDop, summarizeDebts, type Debt } from "@ahorra/domain";
-import { ArrowDownLeft, ArrowUpRight, Users } from "lucide-react";
+import { ICON_TEXT } from "../../components/icons";
+import { ArrowDownLeft, ArrowUpRight, Users } from "../../components/icons";
 
 /**
  * Las tres cifras que responde esta pantalla de un vistazo.
@@ -40,7 +41,7 @@ export function DebtsOverviewStrip({ debts }: { debts: Debt[] }) {
       {figures.map(({ key, label, amount, Icon }) => (
         <div className={`debts-overview-figure ${key}`} key={key}>
           <span className="debts-overview-label">
-            <Icon size={14} aria-hidden="true" /> {label}
+            <Icon size={ICON_TEXT} aria-hidden="true" /> {label}
           </span>
           <strong>{formatDop(amount)}</strong>
         </div>
