@@ -1,7 +1,7 @@
 import { formatDop, type MovementType, type Movement } from "@ahorra/domain";
 import { AnimatePresence } from "framer-motion";
 import { AlertTriangle, Plus } from "lucide-react";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useAuth } from "../features/auth/AuthProvider";
 import { BalanceBridge } from "../components/BalanceBridge";
 import { BottomNav } from "../components/layout/BottomNav";
@@ -15,16 +15,32 @@ import { EmptyState } from "../features/dashboard/EmptyState";
 import { MonthBalanceChart } from "../features/dashboard/MonthBalanceChart";
 import { RecentMovements } from "../features/dashboard/RecentMovements";
 import { MovementDialog } from "../features/movements/MovementDialog";
-import { MovementsPage } from "../features/movements/MovementsPage";
+const MovementsPage = lazy(() =>
+  import("../features/movements/MovementsPage").then((m) => ({ default: m.MovementsPage }))
+);
 import { RecurrencesPanel } from "../features/movements/RecurrencesPanel";
 import { BudgetAlertBanner } from "../features/budget/BudgetAlertBanner";
-import { BudgetPage } from "../features/budget/BudgetPage";
-import { DebtsPage } from "../features/debts/DebtsPage";
-import { GoalsPage } from "../features/goals/GoalsPage";
-import { ReportsPage } from "../features/reports/ReportsPage";
-import { SettingsPage } from "../features/settings/SettingsPage";
-import { WhatsNewPage } from "../features/whatsnew/WhatsNewPage";
-import { NotFoundPage } from "../pages/NotFoundPage";
+const BudgetPage = lazy(() =>
+  import("../features/budget/BudgetPage").then((m) => ({ default: m.BudgetPage }))
+);
+const DebtsPage = lazy(() =>
+  import("../features/debts/DebtsPage").then((m) => ({ default: m.DebtsPage }))
+);
+const GoalsPage = lazy(() =>
+  import("../features/goals/GoalsPage").then((m) => ({ default: m.GoalsPage }))
+);
+const ReportsPage = lazy(() =>
+  import("../features/reports/ReportsPage").then((m) => ({ default: m.ReportsPage }))
+);
+const SettingsPage = lazy(() =>
+  import("../features/settings/SettingsPage").then((m) => ({ default: m.SettingsPage }))
+);
+const WhatsNewPage = lazy(() =>
+  import("../features/whatsnew/WhatsNewPage").then((m) => ({ default: m.WhatsNewPage }))
+);
+const NotFoundPage = lazy(() =>
+  import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage }))
+);
 import { useSpaces } from "../hooks/useSpaces";
 import { useMonthlyData } from "../hooks/useMonthlyData";
 import { useModuleData } from "../hooks/useModuleData";
@@ -35,7 +51,9 @@ import { useOfflineSync } from "../hooks/useOfflineSync";
 import { useReminder } from "../hooks/useReminder";
 import { WhatsNewPanel } from "../components/WhatsNewPanel";
 import { OfflineBanner } from "../components/OfflineBanner";
+import { ChunkBoundary } from "../components/ChunkBoundary";
 import { MotionProvider } from "../components/MotionProvider";
+import { PageFallback } from "../components/PageFallback";
 import { Toaster } from "../components/Toaster";
 import { expenseCategories } from "../lib/categories";
 import { currentMonth, monthLabel } from "../lib/format";
@@ -149,162 +167,173 @@ export default function App() {
           </header>
 
           <div key={pathname} className="page-transition">
-            {pathname === "/" || pathname === "/inicio" ? (
-              <>
-                <section className="hero" aria-labelledby="available-title">
-                  <div>
-                    <p className="eyebrow">Disponible después de ahorro</p>
-                    <h1 id="available-title">
-                      {loading ? (
-                        <span className="skeleton skeleton-hero-number" aria-label="Calculando" />
-                      ) : (
-                        formatDop(animatedAvailable)
-                      )}
-                    </h1>
-                    <p>Para {monthLabel(month)} según tus registros</p>
-                    {!loading && (
-                      <BalanceBridge
-                        beforeSavingsCents={summary.availableBeforeSavingsCents}
-                        contributionCents={summary.contributionCents}
-                        afterSavingsCents={summary.availableAfterSavingsCents}
-                      />
-                    )}
-                  </div>
-                  <div className="hero-stats">
-                    <Stat label="Ingresos" value={summary.incomeCents} tone="income" />
-                    <Stat label="Gastos" value={summary.expenseCents} tone="expense" />
-                    <Stat label="Ahorro" value={summary.contributionCents} tone="savings" />
-                  </div>
-                </section>
-
-                {!loading && summary.availableAfterSavingsCents < 0 && (
-                  <section className="allocation-alert" role="status">
-                    <div>
-                      <span aria-hidden="true">!</span>
+            <ChunkBoundary>
+              <Suspense fallback={<PageFallback />}>
+                {pathname === "/" || pathname === "/inicio" ? (
+                  <>
+                    <section className="hero" aria-labelledby="available-title">
                       <div>
-                        <strong>
-                          Tu plan supera el dinero disponible por{" "}
-                          {formatDop(Math.abs(summary.availableAfterSavingsCents))}
-                        </strong>
-                        <p>
-                          Después de los gastos quedaban{" "}
-                          {formatDop(summary.availableBeforeSavingsCents)}, pero separaste{" "}
-                          {formatDop(summary.contributionCents)} para ahorro. Ajusta gastos o el
-                          aporte de este periodo.
-                        </p>
+                        <p className="eyebrow">Disponible después de ahorro</p>
+                        <h1 id="available-title">
+                          {loading ? (
+                            <span
+                              className="skeleton skeleton-hero-number"
+                              aria-label="Calculando"
+                            />
+                          ) : (
+                            formatDop(animatedAvailable)
+                          )}
+                        </h1>
+                        <p>Para {monthLabel(month)} según tus registros</p>
+                        {!loading && (
+                          <BalanceBridge
+                            beforeSavingsCents={summary.availableBeforeSavingsCents}
+                            contributionCents={summary.contributionCents}
+                            afterSavingsCents={summary.availableAfterSavingsCents}
+                          />
+                        )}
                       </div>
-                    </div>
-                    <div className="button-row">
-                      <button className="secondary" onClick={() => navigate("/movimientos")}>
-                        Revisar gastos
-                      </button>
-                      <button className="primary" onClick={() => navigate("/metas")}>
-                        Ajustar metas
-                      </button>
-                    </div>
-                  </section>
-                )}
+                      <div className="hero-stats">
+                        <Stat label="Ingresos" value={summary.incomeCents} tone="income" />
+                        <Stat label="Gastos" value={summary.expenseCents} tone="expense" />
+                        <Stat label="Ahorro" value={summary.contributionCents} tone="savings" />
+                      </div>
+                    </section>
 
-                <OfflineBanner
-                  online={offline.online}
-                  pending={offline.pending}
-                  onSync={() => void offline.sync()}
-                />
+                    {!loading && summary.availableAfterSavingsCents < 0 && (
+                      <section className="allocation-alert" role="status">
+                        <div>
+                          <span aria-hidden="true">!</span>
+                          <div>
+                            <strong>
+                              Tu plan supera el dinero disponible por{" "}
+                              {formatDop(Math.abs(summary.availableAfterSavingsCents))}
+                            </strong>
+                            <p>
+                              Después de los gastos quedaban{" "}
+                              {formatDop(summary.availableBeforeSavingsCents)}, pero separaste{" "}
+                              {formatDop(summary.contributionCents)} para ahorro. Ajusta gastos o el
+                              aporte de este periodo.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="button-row">
+                          <button className="secondary" onClick={() => navigate("/movimientos")}>
+                            Revisar gastos
+                          </button>
+                          <button className="primary" onClick={() => navigate("/metas")}>
+                            Ajustar metas
+                          </button>
+                        </div>
+                      </section>
+                    )}
 
-                {!loading && <BalanceCard balance={balance} />}
-
-                {!loading && <BudgetAlertBanner limits={budgetLimits} summary={summary} />}
-
-                {error && (
-                  <div className="error-banner" role="alert">
-                    <AlertTriangle size={18} aria-hidden="true" />
-                    <span>{error}</span>
-                    <button onClick={() => setRefreshKey((value) => value + 1)}>Reintentar</button>
-                  </div>
-                )}
-
-                {!loading && movements.length === 0 ? (
-                  <EmptyState
-                    onIncome={() => openForm("INCOME")}
-                    onExpense={() => openForm("EXPENSE")}
-                  />
-                ) : (
-                  <div className="dashboard-grid">
-                    <MonthBalanceChart movements={movements} month={month} />
-                    <RecentMovements
-                      movements={movements}
-                      onEdit={editMovement}
-                      onViewAll={() => navigate("/movimientos")}
+                    <OfflineBanner
+                      online={offline.online}
+                      pending={offline.pending}
+                      onSync={() => void offline.sync()}
                     />
-                    <CategoryChart summary={summary} />
-                  </div>
-                )}
-              </>
-            ) : pathname === "/movimientos" ? (
-              <MovementsPage
-                movements={movements}
-                onAdd={openForm}
-                onEdit={editMovement}
-                minDate={auth.user?.created_at ? auth.user.created_at.substring(0, 10) : undefined}
-                recurrencesSlot={
-                  <RecurrencesPanel
+
+                    {!loading && <BalanceCard balance={balance} />}
+
+                    {!loading && <BudgetAlertBanner limits={budgetLimits} summary={summary} />}
+
+                    {error && (
+                      <div className="error-banner" role="alert">
+                        <AlertTriangle size={18} aria-hidden="true" />
+                        <span>{error}</span>
+                        <button onClick={() => setRefreshKey((value) => value + 1)}>
+                          Reintentar
+                        </button>
+                      </div>
+                    )}
+
+                    {!loading && movements.length === 0 ? (
+                      <EmptyState
+                        onIncome={() => openForm("INCOME")}
+                        onExpense={() => openForm("EXPENSE")}
+                      />
+                    ) : (
+                      <div className="dashboard-grid">
+                        <MonthBalanceChart movements={movements} month={month} />
+                        <RecentMovements
+                          movements={movements}
+                          onEdit={editMovement}
+                          onViewAll={() => navigate("/movimientos")}
+                        />
+                        <CategoryChart summary={summary} />
+                      </div>
+                    )}
+                  </>
+                ) : pathname === "/movimientos" ? (
+                  <MovementsPage
+                    movements={movements}
+                    onAdd={openForm}
+                    onEdit={editMovement}
+                    minDate={
+                      auth.user?.created_at ? auth.user.created_at.substring(0, 10) : undefined
+                    }
+                    recurrencesSlot={
+                      <RecurrencesPanel
+                        accessToken={accessToken}
+                        spaceId={spaceId}
+                        recurrences={recurrences}
+                        customCategories={customCategories}
+                        goals={goals}
+                        onSaved={() => setRefreshKey((value) => value + 1)}
+                      />
+                    }
+                  />
+                ) : pathname === "/presupuesto" ? (
+                  <BudgetPage
                     accessToken={accessToken}
                     spaceId={spaceId}
-                    recurrences={recurrences}
+                    month={month}
+                    summary={summary}
+                    limits={budgetLimits}
                     customCategories={customCategories}
+                    onSaved={() => setRefreshKey((value) => value + 1)}
+                  />
+                ) : pathname === "/metas" ? (
+                  <GoalsPage
+                    accessToken={accessToken}
+                    spaceId={spaceId}
                     goals={goals}
                     onSaved={() => setRefreshKey((value) => value + 1)}
                   />
-                }
-              />
-            ) : pathname === "/presupuesto" ? (
-              <BudgetPage
-                accessToken={accessToken}
-                spaceId={spaceId}
-                month={month}
-                summary={summary}
-                limits={budgetLimits}
-                customCategories={customCategories}
-                onSaved={() => setRefreshKey((value) => value + 1)}
-              />
-            ) : pathname === "/metas" ? (
-              <GoalsPage
-                accessToken={accessToken}
-                spaceId={spaceId}
-                goals={goals}
-                onSaved={() => setRefreshKey((value) => value + 1)}
-              />
-            ) : pathname === "/deudas" ? (
-              <DebtsPage
-                accessToken={accessToken}
-                spaceId={spaceId}
-                debts={debts}
-                onSaved={() => setRefreshKey((value) => value + 1)}
-              />
-            ) : pathname === "/novedades" ? (
-              <WhatsNewPage />
-            ) : pathname === "/reportes" ? (
-              <ReportsPage
-                summary={summary}
-                movements={movements}
-                month={month}
-                accessToken={accessToken}
-                spaceId={spaceId}
-              />
-            ) : pathname === "/configuracion" ? (
-              <SettingsPage
-                accessToken={accessToken}
-                spaces={spaces}
-                spaceId={spaceId}
-                balance={balance}
-                reminder={reminder.settings}
-                onReminderChange={reminder.save}
-                user={auth.user}
-                onSaved={() => setRefreshKey((value) => value + 1)}
-              />
-            ) : (
-              <NotFoundPage />
-            )}
+                ) : pathname === "/deudas" ? (
+                  <DebtsPage
+                    accessToken={accessToken}
+                    spaceId={spaceId}
+                    debts={debts}
+                    onSaved={() => setRefreshKey((value) => value + 1)}
+                  />
+                ) : pathname === "/novedades" ? (
+                  <WhatsNewPage />
+                ) : pathname === "/reportes" ? (
+                  <ReportsPage
+                    summary={summary}
+                    movements={movements}
+                    month={month}
+                    accessToken={accessToken}
+                    spaceId={spaceId}
+                  />
+                ) : pathname === "/configuracion" ? (
+                  <SettingsPage
+                    accessToken={accessToken}
+                    spaces={spaces}
+                    spaceId={spaceId}
+                    balance={balance}
+                    reminder={reminder.settings}
+                    onReminderChange={reminder.save}
+                    user={auth.user}
+                    onSaved={() => setRefreshKey((value) => value + 1)}
+                  />
+                ) : (
+                  <NotFoundPage />
+                )}
+              </Suspense>
+            </ChunkBoundary>
           </div>
         </main>
 

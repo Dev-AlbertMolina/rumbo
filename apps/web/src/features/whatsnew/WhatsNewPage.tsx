@@ -2,6 +2,7 @@ import { MapPin, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { PageTitle } from "../../components/PageTitle";
 import { PreviewFrame } from "./PreviewFrame";
+import { RELEASE_PREVIEWS } from "./releasePreviews";
 import { RELEASES } from "./releases";
 
 function formatDate(date: string): string {
@@ -52,24 +53,27 @@ export function WhatsNewPage() {
 
               {open && (
                 <div className="release-entries">
-                  {release.entries.map((entry) => (
-                    <article className="release-entry" key={entry.title}>
-                      {entry.Preview && (
-                        <PreviewFrame>
-                          <entry.Preview />
-                        </PreviewFrame>
-                      )}
-                      <div>
-                        <h3>{entry.title}</h3>
-                        <p>{entry.description}</p>
-                        {entry.where && (
-                          <p className="release-where">
-                            <MapPin size={14} aria-hidden="true" /> {entry.where}
-                          </p>
+                  {release.entries.map((entry) => {
+                    const Preview = RELEASE_PREVIEWS[entry.title];
+                    return (
+                      <article className="release-entry" key={entry.title}>
+                        {Preview && (
+                          <PreviewFrame>
+                            <Preview />
+                          </PreviewFrame>
                         )}
-                      </div>
-                    </article>
-                  ))}
+                        <div>
+                          <h3>{entry.title}</h3>
+                          <p>{entry.description}</p>
+                          {entry.where && (
+                            <p className="release-where">
+                              <MapPin size={14} aria-hidden="true" /> {entry.where}
+                            </p>
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
               )}
             </section>

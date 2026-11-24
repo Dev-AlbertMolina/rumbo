@@ -1,30 +1,9 @@
-import type { ComponentType } from "react";
-import {
-  BalancePreview,
-  DebtKindPickerPreview,
-  DebtsModulePreview,
-  MovementsMobilePreview,
-  BudgetAlertPreview,
-  GoalPacePreview,
-  OfflinePreview,
-  ReceiptPreview,
-  RecurrencePreview,
-  ReminderPreview,
-  SanPreview,
-  ToastPreview,
-  BudgetPacePreview,
-  CategoryChangesPreview,
-  MonthBalancePreview
-} from "./previews";
-
 export interface ReleaseEntry {
   title: string;
   /** Que cambio, en una o dos frases y sin jerga. */
   description: string;
   /** Donde encontrarlo dentro de la app. */
   where?: string;
-  /** El componente real de la app, montado con datos de ejemplo. */
-  Preview?: ComponentType;
 }
 
 export interface Release {
@@ -58,22 +37,19 @@ export const RELEASES: Release[] = [
         title: "¿Llego a fin de mes?",
         description:
           "El inicio muestra tu disponible día a día: lo registrado hasta hoy y, punteado, lo programado hasta el cierre. Los días en que el dinero no alcanza salen en rojo, y el título te dice con cuánto cierras. Toca el gráfico para ver cada día. De paso, el inicio deja de repetir dos veces ingresos, gastos y ahorro.",
-        where: "Inicio",
-        Preview: MonthBalancePreview
+        where: "Inicio"
       },
       {
         title: "Presupuesto: ¿voy muy rápido?",
         description:
           "Cada barra lleva una marca con el punto del mes en que estás. Si el gasto la pasa de largo, la barra cambia de color antes de llegar al límite, cuando todavía hay tiempo de corregir.",
-        where: "Presupuesto",
-        Preview: BudgetPacePreview
+        where: "Presupuesto"
       },
       {
         title: "Reportes: qué cambió frente al mes anterior",
         description:
           "Categoría por categoría, cuánto subió o bajó tu gasto respecto al mes pasado, empezando por lo que más se movió. Antes Reportes repetía los gráficos del inicio.",
-        where: "Reportes",
-        Preview: CategoryChangesPreview
+        where: "Reportes"
       }
     ]
   },
@@ -88,8 +64,7 @@ export const RELEASES: Release[] = [
         title: "Te confirma lo que guardas",
         description:
           "Al guardar un gasto, un presupuesto, una recurrencia o un pago aparece un aviso breve abajo de la pantalla. Antes el mensaje salía dentro de la página y, si habías bajado, no lo veías. Se quita solo, o deslizándolo hacia un lado.",
-        where: "En toda la app",
-        Preview: ToastPreview
+        where: "En toda la app"
       },
       {
         title: "Responde cuando la tocas",
@@ -106,8 +81,7 @@ export const RELEASES: Release[] = [
         title: "Avisos más limpios",
         description:
           "Los avisos de presupuesto, de sin conexión y de error dejan la franja gruesa de color a un lado: ahora llevan fondo de color e icono. En Deudas las tarjetas también la pierden, y el color queda en la etiqueta, la barra y la cifra del resumen.",
-        where: "Inicio y Deudas",
-        Preview: BudgetAlertPreview
+        where: "Inicio y Deudas"
       },
       {
         title: "Entrar desde el teléfono sin bajar",
@@ -127,22 +101,19 @@ export const RELEASES: Release[] = [
         title: "Deudas: el color dice hacia dónde va el dinero",
         description:
           "Los tres tipos compartían el mismo verde, así que la pantalla no distinguía lo que debes de lo que te deben. Ahora cada uno lleva su color en el borde de la tarjeta, la etiqueta y la barra. Dentro de cada una manda lo que falta: antes era el texto más chico y un botón enorme se llevaba la atención. Y arriba aparece el total, que antes había que sumar a ojo.",
-        where: "Deudas",
-        Preview: DebtsModulePreview
+        where: "Deudas"
       },
       {
         title: "Elegir el tipo dejó de ser un desplegable",
         description:
           "Esa elección decide qué campos aparecen y de qué color sale la tarjeta, y estaba escondida detrás de un clic. Ahora son tres opciones a la vista, con los mismos colores de las tarjetas y una línea que explica cada una.",
-        where: "Deudas, al crear un compromiso",
-        Preview: DebtKindPickerPreview
+        where: "Deudas, al crear un compromiso"
       },
       {
         title: "Movimientos ya no se arrastra de lado",
         description:
           "La tabla necesitaba más del doble del ancho de un teléfono: el monto quedaba fuera de pantalla. En móvil ahora es una lista donde cada movimiento se lee entero de una vez. Y los filtros se pliegan detrás de un botón, así la lista empieza mucho más arriba.",
-        where: "Movimientos, en el teléfono",
-        Preview: MovementsMobilePreview
+        where: "Movimientos, en el teléfono"
       }
     ]
   },
@@ -157,57 +128,49 @@ export const RELEASES: Release[] = [
         title: "Lo que se repite se registra solo",
         description:
           "Declaras una vez el alquiler, el sueldo o una suscripción, y Rumbo lo anota el día que toca. Ya no hay que entrar cada mes a escribir lo mismo. Los movimientos que aparecen solos quedan marcados como recurrentes.",
-        where: "Movimientos, arriba de la lista",
-        Preview: RecurrencePreview
+        where: "Movimientos, arriba de la lista"
       },
       {
         title: "Te avisa antes de pasarte del presupuesto",
         description:
           "Al llegar al 80% de lo que fijaste para una categoría, y de nuevo al pasarte, el inicio te lo dice con el nombre y el monto. Antes solo te enterabas si entrabas a mirar.",
-        where: "Inicio y Presupuesto",
-        Preview: BudgetAlertPreview
+        where: "Inicio y Presupuesto"
       },
       {
         title: "Cuánto apartar al mes para llegar a tu meta",
         description:
           "Si tu meta tiene fecha, Rumbo divide lo que falta entre los meses que quedan y te dice la cifra. Si te atrasas, la recalcula y te avisa.",
-        where: "Metas",
-        Preview: GoalPacePreview
+        where: "Metas"
       },
       {
         title: "Ahora sabe cuánto dinero tienes",
         description:
           "Antes solo contaba el mes, y lo que sobraba en enero desaparecía en febrero. Ahora acumula, y separa lo que ya tienes apartado en metas de lo que sigue libre. Puedes indicar con cuánto empezabas.",
-        where: "Inicio, y el saldo inicial en Configuración",
-        Preview: BalancePreview
+        where: "Inicio, y el saldo inicial en Configuración"
       },
       {
         title: "Deudas, préstamos y sanes",
         description:
           "Un módulo nuevo para lo que debes y lo que te deben. El san se trata como lo que es: ves la rueda completa, cuál es tu turno, y si por ahora estás prestando al grupo o ya te toca devolver.",
-        where: "Deudas",
-        Preview: SanPreview
+        where: "Deudas"
       },
       {
         title: "Foto del recibo",
         description:
           "Le adjuntas una foto a un gasto desde la cámara del teléfono. Se guarda en privado y solo tú puedes verla. Dos meses después, ya no hay que adivinar qué era ese cargo.",
-        where: "Al registrar o editar un gasto",
-        Preview: ReceiptPreview
+        where: "Al registrar o editar un gasto"
       },
       {
         title: "Funciona sin internet",
         description:
           "Puedes anotar un gasto en la calle aunque no tengas señal. Queda marcado como pendiente y se sube solo en cuanto vuelve la conexión, sin que tengas que hacer nada.",
-        where: "En todos lados",
-        Preview: OfflinePreview
+        where: "En todos lados"
       },
       {
         title: "Recordatorio diario",
         description:
           "Eliges una hora y Rumbo te avisa para anotar lo del día. El aviso lo lanza tu propio aparato, así que solo suena mientras la app sigue abierta.",
-        where: "Configuración",
-        Preview: ReminderPreview
+        where: "Configuración"
       }
     ]
   },
