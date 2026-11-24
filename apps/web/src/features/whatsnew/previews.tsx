@@ -24,6 +24,9 @@ import { SanProgress } from "../debts/SanProgress";
 import { GoalPaceNote } from "../goals/GoalPaceNote";
 import { RecurrencesPanel } from "../movements/RecurrencesPanel";
 import { ReminderCard } from "../settings/ReminderCard";
+import { PageFallback } from "../../components/PageFallback";
+import { MovementsPage } from "../movements/MovementsPage";
+import { rememberFilters } from "../../app/viewMemory";
 import { today } from "../../lib/format";
 
 /**
@@ -432,6 +435,117 @@ export function ServiceErrorPreview() {
       <p className="auth-error" role="alert">
         {describeAuthError(new TypeError("Failed to fetch"))}
       </p>
+    </div>
+  );
+}
+
+/**
+ * Las tres novedades de la 1.0 que no son una pantalla nueva.
+ *
+ * Dos de ellas —que abra antes y que te devuelva donde estabas— no se pueden
+ * retratar con una pantalla, porque lo que cambia es el tiempo y el camino. Lo
+ * que si se puede es ensenar lo medido y el estado en el que te deja.
+ */
+
+/** Lo medido antes y despues, sobre la compilacion de produccion. */
+const SPEED_ROWS = [
+  {
+    label: "Primera carga en el teléfono",
+    unit: "KB",
+    before: 541,
+    after: 498,
+    note: "lo que hay que descargar antes de ver algo"
+  },
+  {
+    label: "Abrir el panel de movimiento, la primera vez",
+    unit: "ms",
+    before: 146,
+    after: 83,
+    note: "el tirón era el desenfoque del fondo"
+  }
+];
+
+export function StartupSpeedPreview() {
+  return (
+    <div className="panel preview-speed">
+      {SPEED_ROWS.map((row) => (
+        <div key={row.label} className="preview-speed-row">
+          <p className="preview-speed-label">
+            {row.label} <span>{row.note}</span>
+          </p>
+          <div className="preview-speed-bars">
+            <span className="preview-speed-bar is-before" style={{ width: "100%" }}>
+              <i>Antes</i>
+              <b>
+                {row.before} {row.unit}
+              </b>
+            </span>
+            <span
+              className="preview-speed-bar is-after"
+              style={{ width: `${Math.round((row.after / row.before) * 100)}%` }}
+            >
+              <i>Ahora</i>
+              <b>
+                {row.after} {row.unit}
+              </b>
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function MonthSwitchPreview() {
+  return (
+    <div className="preview-month-switch">
+      <div>
+        <p className="preview-caption">Antes: la pantalla se vaciaba</p>
+        <PageFallback />
+      </div>
+      <div>
+        <p className="preview-caption">Ahora: se queda, apenas atenuado</p>
+        {/* El mismo contenedor y la misma clase que usa la app al cambiar de
+            mes, para que el atenuado que se ve aqui sea el de verdad. */}
+        <div className="page-transition is-stale">
+          <BalanceCard balance={balance} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * La memoria de la pantalla de Movimientos, con su propio nombre.
+ *
+ * Montar aqui la pantalla de verdad obliga a darle un nombre aparte: si usara
+ * el suyo, esta vista previa le cambiaria los filtros a quien este usando
+ * Movimientos.
+ */
+const MEMORY_EXAMPLE_PATH = "/novedades/vuelves-donde-estabas";
+
+rememberFilters(MEMORY_EXAMPLE_PATH, {
+  query: "supermercado",
+  type: "EXPENSE",
+  status: "ALL",
+  period: "ALL",
+  rangeFrom: "",
+  rangeTo: ""
+});
+
+export function ViewMemoryPreview() {
+  return (
+    <div className="preview-view-memory">
+      <p className="preview-caption">
+        Vuelves a Movimientos y sigue puesto lo que tenías: el filtro, la
+        búsqueda y el sitio de la lista.
+      </p>
+      <MovementsPage
+        movements={sampleMovements}
+        onAdd={noop}
+        onEdit={noop}
+        viewPath={MEMORY_EXAMPLE_PATH}
+      />
     </div>
   );
 }

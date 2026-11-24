@@ -14,7 +14,8 @@ export function MovementsPage({
   onAdd,
   onEdit,
   minDate,
-  recurrencesSlot
+  recurrencesSlot,
+  viewPath = "/movimientos"
 }: {
   movements: Movement[];
   onAdd: (type: MovementType) => void;
@@ -23,11 +24,19 @@ export function MovementsPage({
   /** Panel de recurrencias. Se recibe montado para no arrastrar hasta aqui
       el token ni el espacio, que esta pagina no necesita para nada mas. */
   recurrencesSlot?: ReactNode;
+  /**
+   * Bajo que nombre recuerda sus filtros.
+   *
+   * Por defecto el suyo. Lo recibe en vez de decidirlo porque la pantalla se
+   * monta tambien fuera de su ruta —la vista previa de Novedades— y ahi no
+   * puede tocar lo que la persona tenga puesto en Movimientos de verdad.
+   */
+  viewPath?: string;
 }) {
   const pageSize = 15;
   // Los filtros se recuerdan mientras dure la sesion: volver a Movimientos
   // no deberia borrar lo que estabas mirando.
-  const saved = recallFilters("/movimientos", {
+  const saved = recallFilters(viewPath, {
     query: "",
     type: "ALL",
     status: "ALL",
@@ -93,8 +102,8 @@ export function MovementsPage({
 
   useEffect(() => setPage(1), [query, type, status, period, rangeFrom, rangeTo]);
   useEffect(() => {
-    rememberFilters("/movimientos", { query, type, status, period, rangeFrom, rangeTo });
-  }, [query, type, status, period, rangeFrom, rangeTo]);
+    rememberFilters(viewPath, { query, type, status, period, rangeFrom, rangeTo });
+  }, [viewPath, query, type, status, period, rangeFrom, rangeTo]);
   useEffect(() => setPage((value) => Math.min(value, totalPages)), [totalPages]);
 
   const periodLabels: Record<string, string> = {

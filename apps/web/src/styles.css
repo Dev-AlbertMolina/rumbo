@@ -4029,3 +4029,90 @@ h2 {
     animation-iteration-count: infinite !important;
   }
 }
+
+/* Vistas previas de las novedades que no son una pantalla nueva: lo medido
+   antes y despues, y el estado en el que la app te deja. */
+.preview-caption {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.preview-speed {
+  display: grid;
+  gap: 22px;
+}
+.preview-speed-row {
+  display: grid;
+  gap: 10px;
+}
+.preview-speed-label {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+.preview-speed-label span {
+  display: block;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+.preview-speed-bars {
+  display: grid;
+  gap: 6px;
+}
+.preview-speed-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 7em;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+/* El "antes" en gris y el "ahora" en el ciruela de la marca: la diferencia no
+   depende solo del color, porque cada barra lleva su etiqueta y su cifra. */
+.preview-speed-bar.is-before {
+  background: var(--muted-surface);
+  color: var(--muted);
+}
+.preview-speed-bar.is-after {
+  background: var(--primary);
+  color: #fff8f0;
+}
+.preview-speed-bar i {
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: var(--text-2xs);
+}
+.preview-speed-bar b {
+  font-variant-numeric: tabular-nums;
+}
+.preview-month-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+/* Cada columna va sobre papel, como una pantalla de verdad: el esqueleto es
+   del color de las superficies apagadas y sobre el beige del marco de la vista
+   previa no se veria. */
+.preview-month-switch > div {
+  background: var(--paper);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-signature);
+  padding: 14px 14px 18px;
+}
+.preview-month-switch .page-fallback {
+  margin-top: 0;
+}
+.preview-month-switch .skeleton-page-panel {
+  height: 200px;
+}
+@media (max-width: 560px) {
+  .preview-month-switch {
+    grid-template-columns: 1fr;
+  }
+}

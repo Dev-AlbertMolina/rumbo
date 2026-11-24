@@ -8,14 +8,17 @@ import {
   DebtsModulePreview,
   GoalPacePreview,
   MonthBalancePreview,
+  MonthSwitchPreview,
   MovementsMobilePreview,
   OfflinePreview,
   ReceiptPreview,
   RecurrencePreview,
   ReminderPreview,
   SanPreview,
+  StartupSpeedPreview,
   ServiceErrorPreview,
-  ToastPreview
+  ToastPreview,
+  ViewMemoryPreview
 } from "./previews";
 
 /**
@@ -31,6 +34,9 @@ import {
  * ninguna quede huerfana.
  */
 export const RELEASE_PREVIEWS: Record<string, ComponentType> = {
+  "Abre más rápido en el teléfono": StartupSpeedPreview,
+  "Cambiar de mes ya no parpadea": MonthSwitchPreview,
+  "Vuelves donde estabas": ViewMemoryPreview,
   "Te dice la verdad cuando algo falla": ServiceErrorPreview,
   "¿Llego a fin de mes?": MonthBalancePreview,
   "Presupuesto: ¿voy muy rápido?": BudgetPacePreview,

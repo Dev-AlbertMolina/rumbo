@@ -43,18 +43,21 @@ export const RELEASES: Release[] = [
     entries: [
       {
         title: "Abre más rápido en el teléfono",
+        hasPreview: true,
         description:
-          "Antes el teléfono descargaba la app entera —todas las pantallas— antes de enseñarte nada, aunque solo fueras a anotar un gasto. Ahora cada pantalla llega cuando entras en ella: la primera carga pesa un 9% menos y Deudas, Reportes o Metas ya no estorban al arranque. Y el panel para registrar un movimiento abre con menos tirón la primera vez de cada sesión: resultó ser el desenfoque del fondo, y quitarlo bajó esa primera apertura de 146 a 83 milésimas. Las siguientes ya iban rápidas antes.",
+          "Antes el teléfono descargaba la app entera —todas las pantallas— antes de enseñarte nada, aunque solo fueras a anotar un gasto. Ahora cada pantalla llega cuando entras en ella: la primera carga pesa un 8% menos y Deudas, Reportes o Metas ya no estorban al arranque. Y el panel para registrar un movimiento abre con menos tirón la primera vez de cada sesión: resultó ser el desenfoque del fondo, y quitarlo bajó esa primera apertura de 146 a 83 milésimas. Las siguientes ya iban rápidas antes.",
         where: "En toda la app"
       },
       {
         title: "Cambiar de mes ya no parpadea",
+        hasPreview: true,
         description:
           "Al cambiar de periodo la pantalla se vaciaba y volvía un instante después. Ahora lo que estás mirando se queda, apenas atenuado, hasta que llegan las cifras del mes nuevo.",
         where: "Inicio"
       },
       {
         title: "Vuelves donde estabas",
+        hasPreview: true,
         description:
           "Ir a mirar una cifra a otra sección y volver te dejaba arriba del todo y sin los filtros que tenías puestos. Ahora cada pestaña recuerda dónde estabas mientras dure la sesión.",
         where: "Movimientos y el resto de secciones"
