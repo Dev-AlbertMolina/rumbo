@@ -120,6 +120,14 @@ describe("la jerarquia del color", () => {
     expect(sueltos, "colores a mano").toEqual([]);
   });
 
+  it("el morado marca, no ocupa", () => {
+    // Elegido mirando las tres dosis: en una pantalla de dinero el color no
+    // puede pesar mas que las cifras. El morado va en el icono, el borde y la
+    // etiqueta; el fondo se queda como el del resto.
+    const comoFondo = css.match(/background:s*var(--pending[a-z-]*)/g) ?? [];
+    expect(comoFondo, "el morado usado como superficie").toEqual([]);
+  });
+
   it("el morado de lo que aun no ha pasado se distingue del ciruela", () => {
     // Lo retire por ser un septimo color sin jerarquia, y el dueno lo pidio de
     // vuelta: separa bien lo programado de lo que ya ocurrio. Medido, tiene
