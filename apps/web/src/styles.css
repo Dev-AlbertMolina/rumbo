@@ -30,8 +30,6 @@
   --danger-bg: #fff0f2;
   --danger-border: #f3cfd7;
   --danger-border-strong: #ebb3c0;
-  --info: #6650a4;
-  --info-bg: #f1eef8;
   --warning: #9a5700;
   --warning-bg: #fff3e2;
   --warning-border: #e2b970;
@@ -41,9 +39,18 @@
      propio dentro de la rueda de un san. */
   --gold-accent: #e3a72f;
   --gold-border: #ecd28a;
-  --info-border: #cfc6e6;
   /* Texto sobre ciruela: el mismo crema del logo, no un blanco puro. */
   --on-primary: #fff8f0;
+  /* Texto y marcas sobre fondos oscuros: el ciruela del hero y el aviso
+     flotante. Medidos contra su fondo, no elegidos a ojo. */
+  --on-primary-soft: #f0d9e4;
+  --on-dark-muted: #e9dcd3;
+  --on-dark-success: #8fd0b1;
+  --on-dark-danger: #f4a3b1;
+  /* El ciruela como superficie, que es lo que hacia el violeta. */
+  --primary-bg: #f6ebf0;
+  --primary-border: #e3cbd7;
+  --danger-bg-strong: #ffe3e9;
 
   /* Movimiento: la misma curva que usa Framer Motion (src/lib/motion.ts), de
      salida fuerte, para que CSS y JS se muevan con el mismo ritmo. */
@@ -613,7 +620,7 @@ h2 {
 }
 @media (hover: hover) and (pointer: fine) {
   .dropdown-logout-btn:hover {
-    background: #ffe3e9;
+    background: var(--danger-bg-strong);
     border-color: var(--danger-border-strong);
   }
 }
@@ -764,7 +771,7 @@ h2 {
   color: var(--muted);
 }
 .hero .eyebrow {
-  color: #f0d9e4;
+  color: var(--on-primary-soft);
 }
 .hero h1 {
   margin: 0 0 7px;
@@ -842,7 +849,7 @@ h2 {
 }
 .hero p {
   margin-bottom: 0;
-  color: #f0d9e4;
+  color: var(--on-primary-soft);
 }
 .balance-bridge {
   margin-top: 18px;
@@ -865,7 +872,7 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 18px;
-  color: #f0d9e4;
+  color: var(--on-primary-soft);
   font-size: var(--text-base);
 }
 .balance-bridge-labels span {
@@ -889,7 +896,7 @@ h2 {
   gap: 7px;
 }
 .stat span {
-  color: #f0d9e4;
+  color: var(--on-primary-soft);
   font-size: var(--text-base);
 }
 .stat strong {
@@ -1189,8 +1196,8 @@ h2 {
   border-color: var(--border);
 }
 .offline-banner.pending {
-  background: var(--info-bg);
-  border-color: var(--info-border);
+  background: var(--primary-bg);
+  border-color: var(--primary-border);
 }
 .offline-banner > div:first-child {
   display: flex;
@@ -1208,8 +1215,8 @@ h2 {
   margin-top: 0;
 }
 .recurrence-badge.pending {
-  background: var(--info-bg);
-  color: var(--info);
+  background: var(--primary-bg);
+  color: var(--primary);
 }
 /* Foto del recibo dentro del dialogo de movimiento. */
 .receipt-field {
@@ -2202,7 +2209,7 @@ h2 {
   transform: translateX(-50%);
 }
 .month-chart-tip span {
-  color: #e9dcd3;
+  color: var(--on-dark-muted);
   font-size: var(--text-xs);
 }
 .month-chart-legend {
@@ -2506,9 +2513,9 @@ h2 {
 }
 .impact-card {
   padding: 15px;
-  border: 1px solid var(--info-border);
+  border: 1px solid var(--primary-border);
   border-radius: var(--radius-md);
-  background: var(--info-bg);
+  background: var(--primary-bg);
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -2838,8 +2845,8 @@ h2 {
 }
 .status-pill.scheduled,
 .status-pill.paused {
-  background: var(--info-bg);
-  color: var(--info);
+  background: var(--primary-bg);
+  color: var(--primary);
 }
 .status-pill.completed {
   background: var(--gold-bg);
@@ -2956,10 +2963,10 @@ h2 {
   flex: none;
 }
 .toast.success > svg {
-  color: #8fd0b1;
+  color: var(--on-dark-success);
 }
 .toast.error > svg {
-  color: #f4a3b1;
+  color: var(--on-dark-danger);
 }
 .toast.info > svg {
   color: var(--accent);
@@ -4116,7 +4123,7 @@ h2 {
 }
 .preview-speed-bar.is-after {
   background: var(--primary);
-  color: #fff8f0;
+  color: var(--on-primary);
 }
 .preview-speed-bar i {
   font-style: normal;

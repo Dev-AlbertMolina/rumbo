@@ -88,3 +88,33 @@ describe("los tokens de la hoja de estilos", () => {
     expect(comoLetra, "hay texto pintado con el verde de marca").toEqual([]);
   });
 });
+
+/**
+ * Un solo acento por pantalla, y el color siempre desde un token.
+ *
+ * Competian ciruela, terracota, dorado, verde, rojo, ambar y violeta sin
+ * jerarquia, y ademas habia colores escritos a mano en reglas sueltas, donde
+ * nadie los mide ni los encuentra al cambiar la paleta.
+ */
+describe("la jerarquia del color", () => {
+  const css = readStyles();
+
+  it("ningun color se escribe a mano fuera de los tokens", () => {
+    const sueltos: string[] = [];
+    let inRoot = false;
+    css.split("\n").forEach((line, index) => {
+      if (/^:root/.test(line)) inRoot = true;
+      else if (inRoot && line.trim() === "}") inRoot = false;
+      if (inRoot || /^\s*--/.test(line)) return;
+      if (/#[0-9a-fA-F]{3,8}\b/.test(line)) sueltos.push(`linea ${index + 1}: ${line.trim()}`);
+    });
+
+    expect(sueltos, "colores a mano").toEqual([]);
+  });
+
+  it("el violeta de informacion ya no existe", () => {
+    // No decia nada que el ciruela no diga, y era un septimo color compitiendo.
+    expect(css).not.toMatch(/--info\b/);
+    expect(css).not.toMatch(/#6650a4/i);
+  });
+});

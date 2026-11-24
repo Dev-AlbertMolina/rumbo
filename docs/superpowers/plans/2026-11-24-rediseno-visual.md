@@ -161,13 +161,14 @@ jerarquía. El color pasa a significar una sola cosa: dirección del dinero.
 - Produce: los roles `--accent-screen`, `--money-in`, `--money-out`,
   `--money-aside`, que las pantallas usan en vez de nombres de color.
 
-- [ ] **Paso 1: la prueba que falla** — recorrer `styles.css` y exigir que
-  ninguna regla de componente use un hex literal: todo color sale de un token.
-- [ ] **Paso 2: verla fallar** — Esperado: FALLA, con la lista de literales.
-- [ ] **Paso 3: sustituirlos** por tokens de rol; el violeta de información
-  desaparece y pasa a ciruela.
-- [ ] **Paso 4: verla pasar** y correr `npm test`.
-- [ ] **Paso 5: commit** — `refactor(web): el color significa dirección del dinero`
+- [x] **Paso 1-2: la prueba** — nueve colores escritos a mano fuera de los
+  tokens, y el violeta vivo. RED con los nueve en la lista.
+- [x] **Paso 3: sustituidos** por tokens de rol, con el contraste medido de
+  cada uno contra su fondo (texto claro sobre ciruela 7.7:1, iconos del aviso
+  flotante 8.8:1 y 8.0:1). El violeta se retira: sus cuatro usos —aviso sin
+  conexión, insignia de recurrencia, tarjeta de impacto y estado en pausa—
+  pasan a ciruela sobre #f6ebf0, que da 8.9:1.
+- [x] **Paso 4-5: verde** y mirado en el navegador: ya no desentona.
 
 ### Tarea 3: Iconos Phosphor, con peso que significa algo
 
