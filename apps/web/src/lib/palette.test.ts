@@ -1,6 +1,14 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { chroma, contrast, cvdDistance, DATA_COLORS, PAPER, TEXT_COLORS } from "./palette";
+import {
+  chroma,
+  contrast,
+  cvdDistance,
+  DATA_COLORS,
+  normalDistance,
+  PAPER,
+  TEXT_COLORS
+} from "./palette";
 
 /** Desde la raiz del repositorio o desde apps/web: la prueba vale igual. */
 function readStyles(): string {
@@ -112,9 +120,15 @@ describe("la jerarquia del color", () => {
     expect(sueltos, "colores a mano").toEqual([]);
   });
 
-  it("el violeta de informacion ya no existe", () => {
-    // No decia nada que el ciruela no diga, y era un septimo color compitiendo.
-    expect(css).not.toMatch(/--info\b/);
-    expect(css).not.toMatch(/#6650a4/i);
+  it("el morado de lo que aun no ha pasado se distingue del ciruela", () => {
+    // Lo retire por ser un septimo color sin jerarquia, y el dueno lo pidio de
+    // vuelta: separa bien lo programado de lo que ya ocurrio. Medido, tiene
+    // razon. Lo que no puede es confundirse con el ciruela de la marca.
+    const morado = css.match(/--pending:\s*(#[0-9a-f]{6})/i)?.[1];
+    expect(morado, "falta el token del morado").toBeDefined();
+    expect(contrast(morado!, PAPER)).toBeGreaterThanOrEqual(4.5);
+    expect(chroma(morado!)).toBeGreaterThanOrEqual(0.1);
+    expect(normalDistance(morado!, TEXT_COLORS.primary!)).toBeGreaterThanOrEqual(15);
+    expect(cvdDistance(morado!, TEXT_COLORS.primary!, "deuteranopia")).toBeGreaterThanOrEqual(8);
   });
 });

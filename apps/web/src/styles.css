@@ -52,9 +52,13 @@
   --on-dark-muted: #e9dcd3;
   --on-dark-success: #8fd0b1;
   --on-dark-danger: #f4a3b1;
-  /* El ciruela como superficie, que es lo que hacia el violeta. */
-  --primary-bg: #f6ebf0;
-  --primary-border: #e3cbd7;
+  /* Morado: lo que todavia no ha pasado —programado, pendiente, en pausa—.
+     No compite con los colores de direccion del dinero porque no habla de
+     direccion, habla de tiempo. Medido: 6.07:1 sobre papel, croma 0.155 y
+     17.5 de separacion del ciruela, por encima del minimo de 15. */
+  --pending: #6d4bb0;
+  --pending-bg: #eee9f9;
+  --pending-border: #d8cff1;
   --danger-bg-strong: #ffe3e9;
 
   /* Movimiento: la misma curva que usa Framer Motion (src/lib/motion.ts), de
@@ -1201,8 +1205,8 @@ h2 {
   border-color: var(--border);
 }
 .offline-banner.pending {
-  background: var(--primary-bg);
-  border-color: var(--primary-border);
+  background: var(--pending-bg);
+  border-color: var(--pending-border);
 }
 .offline-banner > div:first-child {
   display: flex;
@@ -1220,8 +1224,8 @@ h2 {
   margin-top: 0;
 }
 .recurrence-badge.pending {
-  background: var(--primary-bg);
-  color: var(--primary);
+  background: var(--pending-bg);
+  color: var(--pending);
 }
 /* Foto del recibo dentro del dialogo de movimiento. */
 .receipt-field {
@@ -2518,9 +2522,9 @@ h2 {
 }
 .impact-card {
   padding: 15px;
-  border: 1px solid var(--primary-border);
+  border: 1px solid var(--pending-border);
   border-radius: var(--radius-md);
-  background: var(--primary-bg);
+  background: var(--pending-bg);
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -2850,8 +2854,8 @@ h2 {
 }
 .status-pill.scheduled,
 .status-pill.paused {
-  background: var(--primary-bg);
-  color: var(--primary);
+  background: var(--pending-bg);
+  color: var(--pending);
 }
 .status-pill.completed {
   background: var(--gold-bg);
