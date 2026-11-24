@@ -18,3 +18,6 @@ apps/web/dev-dist/
 # medirlos y mirarlos. No forma parte de la app.
 apps/web/harness.html
 apps/web/src/harness.tsx
+
+# Mediciones de un rato, nunca del repositorio.
+apps/web/src/lib/_medir.test.ts
