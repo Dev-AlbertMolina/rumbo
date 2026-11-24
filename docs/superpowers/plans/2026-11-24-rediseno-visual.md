@@ -44,10 +44,13 @@ introduce, no en todo el plan.
 
 Valen para todas las tareas.
 
-- **El arranque no puede crecer.** Medido hoy sobre la compilación de
-  producción: `dist/assets/index-*.js` = 497.869 bytes. Ninguna tarea puede
-  dejarlo por encima de **500.000 bytes**. Se comprueba con
-  `npm run build -w @ahorra/web` y `stat -c %s dist/assets/index-*.js`.
+- **El arranque no puede crecer.** Medido sobre la compilación de producción
+  tras la actualización de seguridad de la tarea 8: `dist/assets/index-*.js`
+  = 518.251 bytes. Ninguna tarea puede dejarlo por encima de **520.000
+  bytes**. Se comprueba con `npm run build -w @ahorra/web` y
+  `stat -c %s dist/assets/index-*.js`.
+  (Eran 497.869 antes de subir zod de 4.1 a 4.6 para cerrar el aviso de
+  seguridad; esos 20 KB los recupera la tarea 11, y con creces.)
 - **Nada de modo oscuro.** Descartado por el dueño. Los tokens se escriben de
   forma que admitirlo después sea posible, pero no se añade ningún tema.
 - **Contraste medido, no estimado:** texto ≥ 4.5:1 contra su fondo; marcas de
@@ -405,3 +408,46 @@ Para que quede dicho y no se confunda con estar resuelto:
   de una persona por cuenta no hace falta todavía.
 - **Copias de seguridad.** Las hace Supabase en su plan; nadie las ha probado
   restaurando. Eso merece su propio día.
+
+---
+
+### Tarea 11: Sacar zod del navegador
+
+Nace de la tarea 8. Subir zod de 4.1 a 4.6 para cerrar el aviso de seguridad
+costó 20 KB en la primera carga, y al ir a mirar por qué apareció algo peor:
+**zod viaja entero al navegador sin que la web use ni uno de sus esquemas.**
+
+Lo comprobé: ningún archivo de `apps/web/src` importa un `*Schema`. Están en
+el mismo `packages/domain/src/index.ts` que las cuentas, así que el navegador
+se descarga la librería de validación de la API para nada. El empaquetador no
+puede quitarla solo: no sabe que `z.object(...)` no tiene efectos, y marcarlo
+con `/* @__PURE__ */` solo ahorró 1 KB (probado y descartado).
+
+**Archivos:**
+- Crear: `packages/domain/src/constants.ts` (los arreglos sueltos:
+  `movementTypes`, `movementStatuses`, `recurrenceFrequencies`, `debtKinds`)
+- Crear: `packages/domain/src/schemas.ts` (todo lo que importa zod, y los
+  tipos derivados con `z.infer`)
+- Modificar: `packages/domain/src/index.ts` (cuentas e interfaces; reexporta
+  los tipos con `export type`, que no deja rastro al compilar)
+- Modificar: `packages/domain/package.json` (añadir la salida `./schemas`)
+- Modificar: los archivos de `apps/api/src` que importan esquemas
+
+**Interfaces:**
+- Produce: `@ahorra/domain` sin zod en tiempo de ejecución, y
+  `@ahorra/domain/schemas` con los esquemas para la API.
+
+- [ ] **Paso 1: la prueba que falla** — `packages/domain/src/entry.test.ts`:
+  el fuente de `index.ts` no contiene `from "zod"`.
+- [ ] **Paso 2: verla fallar** — Esperado: FALLA, la primera línea lo importa.
+- [ ] **Paso 3: mover** las constantes y los esquemas a sus archivos, dejando
+  en `index.ts` solo cuentas, interfaces y reexportación de tipos.
+- [ ] **Paso 4: la salida nueva** en `package.json`, y actualizar la API.
+- [ ] **Paso 5: `npm test` y `npm run typecheck`** — Esperado: dominio 53/53 y
+  la API igual que antes; si un esquema cambió de sitio sin querer, aquí se ve.
+- [ ] **Paso 6: medir** — `npm run build -w @ahorra/web`.
+  Esperado: por debajo de **470.000 bytes**, es decir los 20 KB del aviso de
+  seguridad recuperados y unos 30 más que nunca hicieron falta.
+- [ ] **Paso 7: actualizar la cifra** de la nota de versión y de su gráfica:
+  hoy dicen 541 → 518 KB, y pasarían a decir la verdad nueva.
+- [ ] **Paso 8: commit** — `perf(domain): la validacion de la API deja de viajar al navegador`
