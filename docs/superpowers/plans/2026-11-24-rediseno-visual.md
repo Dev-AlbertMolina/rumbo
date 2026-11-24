@@ -210,8 +210,9 @@ mirarla: un icono que cambia de significado es peor que uno feo.
   todos los titulares salen del token `--font-display`; el token lleva una
   pila de respaldo real (`Georgia, serif`).
 - [ ] **Paso 2: verla fallar.**
-- [ ] **Paso 3: instalar** `@fontsource-variable/newsreader@5.3.0`, importar
-  solo el subconjunto latino, y definir `--font-display`.
+- [x] **Paso 3: instalado** `@fontsource/newsreader` en su peso 600 latino,
+  no la variable: la variable pesa 58 KB y de ella solo se usaria un peso; la
+  estatica son 23,8 KB, frente a los 18,1 de Fraunces. Token `--font-display`.
 - [ ] **Paso 4: `font-display: swap`** y comprobar que el salto de Georgia a
   Newsreader no mueve el contenido: misma altura de línea en los dos.
 - [ ] **Paso 5: medir** el arranque otra vez y el peso de la fuente.

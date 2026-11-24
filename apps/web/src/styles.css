@@ -3,6 +3,11 @@
   color: #2b211e;
   background: #fff8f0;
   font-synthesis: none;
+  /* Titulares. Newsreader en vez de la serif anterior: mas contraste, aguanta a 20 px
+     en los titulos de seccion, y no es la serif que sale por defecto en todo
+     lo que se genera con IA. El texto y las cifras siguen en Atkinson
+     Hyperlegible, que esta dibujada para leerse. */
+  --font-display: "Newsreader", Georgia, serif;
   --paper: #fff8f0;
   /* Blanco apenas tenido hacia el crema del fondo: un blanco puro al lado del
      papel se leia frio, como una pieza de otra app. */
@@ -116,7 +121,7 @@ p {
 }
 h1,
 h2 {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
 }
 .skip-link {
   position: fixed;
@@ -162,7 +167,7 @@ h2 {
   animation: logoIn 0.3s var(--ease-out) backwards;
 }
 .brand-name {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-xl);
   color: var(--ink);
   letter-spacing: -0.3px;
@@ -412,7 +417,7 @@ h2 {
   display: none;
   align-items: center;
   gap: 10px;
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-xl);
   color: var(--ink);
 }
@@ -1075,7 +1080,7 @@ h2 {
   font-size: var(--text-sm);
 }
 .release-heading strong {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-xl);
 }
 .release-summary {
@@ -1130,12 +1135,12 @@ h2 {
 }
 .preview-goal h2 {
   margin: 0 0 6px;
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-xl);
 }
 .release-entry h3 {
   margin: 0 0 8px;
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-lg);
 }
 .release-entry p {
@@ -1293,7 +1298,7 @@ h2 {
   background: var(--surface);
 }
 .debts-overview-figure strong {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-xl);
   font-variant-numeric: tabular-nums;
 }
@@ -1524,7 +1529,7 @@ h2 {
    orden; .panel.debt-card la supera y de paso dice lo que la tarjeta es. */
 .panel.debt-card h2 {
   margin: 0;
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-lg);
   line-height: 1.25;
   text-wrap: balance;
@@ -1546,7 +1551,7 @@ h2 {
   font-size: var(--text-sm);
 }
 .debt-figure strong {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-2xl);
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
@@ -1664,7 +1669,7 @@ h2 {
   margin-top: 4px;
 }
 .balance-total strong {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-3xl);
   line-height: 1.1;
 }
@@ -1710,7 +1715,7 @@ h2 {
 }
 .settings-value {
   margin: 6px 0 0;
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-2xl);
 }
 .settings-hint {
@@ -1768,7 +1773,7 @@ h2 {
   font-size: var(--text-lg);
 }
 .recurrences-toggle strong {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-xl);
   line-height: 1.2;
 }
@@ -2262,7 +2267,7 @@ h2 {
   background: var(--accent);
   display: grid;
   place-items: center;
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--text-4xl);
   transform: rotate(-3deg);
 }
@@ -3309,7 +3314,7 @@ h2 {
 }
 .contribution-history h3 {
   margin: 0 0 10px;
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--font-display);
 }
 .contribution-history > p {
   color: var(--muted);

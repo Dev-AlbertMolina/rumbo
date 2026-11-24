@@ -14,7 +14,7 @@
   "dependencies": {
     "@ahorra/domain": "*",
     "@fontsource/atkinson-hyperlegible": "^5.2.7",
-    "@fontsource/fraunces": "^5.2.8",
+    "@fontsource/newsreader": "^5.2.5",
     "@supabase/supabase-js": "^2.57.4",
     "dexie": "^4.2.1",
     "framer-motion": "^13.3.0",
