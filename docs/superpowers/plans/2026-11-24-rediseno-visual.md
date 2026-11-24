@@ -311,7 +311,7 @@ ya repartes.
 | **E3** | La API no tiene límite de peticiones | En serverless eso es factura y carga de base; y `/api/health` es pública |
 | **E4** | CORS permite siempre `http://localhost` y `capacitor://localhost` | Riesgo bajo (el token va en cabecera, no en cookie), pero es una puerta que no hace falta tener abierta en la web |
 | **I1** | El aislamiento entre personas depende de que cada consulta lleve `user_id`; la API entra con `DATABASE_URL` directo, así que las políticas RLS casi seguro no se aplican | Una sola consulta sin esa cláusula enseña el dinero de otra persona |
-| **I2** | Cerrar sesión no borra la base local | Los movimientos pendientes —montos, descripciones, categorías— se quedan en el aparato. En un teléfono prestado, eso es tu dinero a la vista |
+| **I2** | ~~Cerrar sesión no borra la base local~~ **Falso: sí la borra.** Lo que falta es avisar | `clearOfflineUserData` ya borra movimientos, cola y metadatos al salir, y tiene prueba. Lo real es mas pequeño: un gasto anotado sin conexión se va con el resto, en silencio |
 | **I3** | La prueba que comprueba el aislamiento existe, pero vive entre las 9 que exigen Docker | Nadie la corre. Una prueba que no corre no protege de nada |
 
 ---
@@ -383,19 +383,36 @@ quien escribe cada consulta.
   Docker, que es justo lo que le falta a la que ya existe.
 - [ ] **Paso 2: verla fallar o pasar.** Si pasa a la primera, ya es un
   cerrojo: lo que protege es la consulta que alguien escriba mañana.
-- [ ] **Paso 3: forzar RLS en la base** — `alter table ... force row level
-  security` en las tablas con `user_id`, para que las políticas se apliquen
-  también al rol dueño con el que entra la API.
-- [ ] **Paso 4: probarlo contra Postgres de verdad** — esta sí necesita
-  `supabase start`; es un cambio mayor y para eso el dueño sí acepta levantar
-  Docker. Esperado: con el token de A, cero filas de B.
-- [ ] **Paso 5: la prueba que falla (aparato compartido)** — tras cerrar
-  sesión, la base local no conserva ningún movimiento pendiente de quien salió.
-- [ ] **Paso 6: borrar lo local al cerrar sesión**, avisando antes si queda
-  algo sin enviar: perder un gasto sin subir sería peor que el riesgo que
-  evitamos.
-- [ ] **Paso 7: `npm test`** y commit —
+- [x] **Paso 3: el aviso antes de salir** — cerrar sesión ya borraba lo local
+  (eso lo tenía mal este plan); lo que faltaba es que no se llevara en
+  silencio un gasto sin enviar. Hecho, con su prueba.
+- [ ] **Paso 4: `npm test`** y commit —
   `feat: el aislamiento deja de depender de acordarse`
+
+#### Lo que NO se hace aquí, y por qué: forzar RLS
+
+Este plan decía "`alter table ... force row level security` y listo". **Eso
+tumbaría la app**, y conviene dejar escrito el porqué antes de que alguien lo
+intente un viernes:
+
+Las políticas de la base están escritas contra `auth.uid()`, que es quien
+eres según Supabase. Pero la API no entra por Supabase: abre su propia
+conexión a Postgres con `DATABASE_URL`. En esa conexión `auth.uid()` es nulo,
+así que hoy las políticas no se aplican —la conexión es la dueña de las
+tablas y las salta— y si se forzaran, se aplicarían contra un `auth.uid()`
+vacío: **cero filas para todo el mundo**.
+
+Hacerlo bien es su propia tarea, y no es pequeña:
+
+1. Que la API entre con un rol que no sea el dueño de las tablas.
+2. Que cada petición abra transacción y haga
+   `set local request.jwt.claims = '{"sub":"<id>"}'` antes de consultar.
+3. Probarlo contra un Postgres de verdad (`supabase start`), con dos usuarios,
+   comprobando que A no ve ni una fila de B.
+4. Desplegarlo sabiendo que un fallo aquí deja la app sin datos para todos.
+
+Mientras tanto, lo que separa a una persona de otra es el `where user_id`, y
+la prueba del paso 1 es el cerrojo que vigila que no falte nunca.
 
 ## Lo que esta parte NO cubre
 

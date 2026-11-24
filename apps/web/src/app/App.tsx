@@ -54,6 +54,8 @@ import { OfflineBanner } from "../components/OfflineBanner";
 import { ChunkBoundary } from "../components/ChunkBoundary";
 import { MotionProvider } from "../components/MotionProvider";
 import { StaleNotice } from "./StaleNotice";
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { unsentBeforeSignOut, unsentWarning } from "../features/auth/signOutGuard";
 import { PageFallback } from "../components/PageFallback";
 import { Toaster } from "../components/Toaster";
 import { expenseCategories } from "../lib/categories";
@@ -69,6 +71,9 @@ export default function App() {
   const [formType, setFormType] = useState<MovementType>("EXPENSE");
   const [editingMovement, setEditingMovement] = useState<Movement | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  // Cuantos movimientos sin enviar se perderian al salir. Null = aun no se ha
+  // preguntado; cerrar sesion pregunta primero y solo avisa si hay algo.
+  const [unsentOnExit, setUnsentOnExit] = useState<number | null>(null);
 
   const { spaces, spaceId, setSpaceId, error: spacesError } = useSpaces(accessToken, auth.user?.id);
   const {
@@ -117,6 +122,20 @@ export default function App() {
     );
   }
 
+  /**
+   * Salir borra del aparato lo de esta persona, que es lo correcto en un
+   * telefono que se presta. Lo que no puede es llevarse en silencio un gasto
+   * que aun no ha llegado al servidor.
+   */
+  async function requestSignOut() {
+    const unsent = await unsentBeforeSignOut(auth.user?.id);
+    if (unsent > 0) {
+      setUnsentOnExit(unsent);
+      return;
+    }
+    await auth.signOut();
+  }
+
   return (
     <MotionProvider>
       <div className="app-shell">
@@ -126,7 +145,7 @@ export default function App() {
         <Sidebar
           pathname={pathname}
           user={auth.user}
-          onSignOut={() => void auth.signOut()}
+          onSignOut={() => void requestSignOut()}
           onAdd={() => openForm("EXPENSE")}
         />
 
@@ -140,7 +159,7 @@ export default function App() {
               {auth.user && (
                 <UserMenu
                   user={auth.user}
-                  onSignOut={() => void auth.signOut()}
+                  onSignOut={() => void requestSignOut()}
                   className="topbar-user-menu"
                 />
               )}
@@ -381,6 +400,23 @@ export default function App() {
         </AnimatePresence>
         <AnimatePresence>
           {whatsNew.show && <WhatsNewPanel key="whats-new" onClose={whatsNew.dismiss} />}
+        </AnimatePresence>
+        <AnimatePresence>
+          {unsentOnExit !== null && (
+            <ConfirmDialog
+              key="unsent-on-exit"
+              title="Hay cosas sin enviar"
+              description={unsentWarning(unsentOnExit)}
+              confirmLabel="Salir igual"
+              cancelLabel="Quedarme"
+              danger
+              onConfirm={() => {
+                setUnsentOnExit(null);
+                void auth.signOut();
+              }}
+              onCancel={() => setUnsentOnExit(null)}
+            />
+          )}
         </AnimatePresence>
         <Toaster />
       </div>
