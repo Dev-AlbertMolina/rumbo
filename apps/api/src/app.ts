@@ -1,20 +1,20 @@
+import { calculateSummary, dominicanDate } from "@ahorra/domain";
+// Los esquemas viven aparte para que no viajen al navegador con las cuentas.
 import {
   budgetLimitSchema,
-  calculateSummary,
-  createGoalSchema,
-  createExpenseCategorySchema,
-  updateExpenseCategorySchema,
-  createMovementSchema,
   createDebtSchema,
+  createExpenseCategorySchema,
+  createGoalSchema,
+  createMovementSchema,
   createRecurringMovementSchemaChecked,
   debtPaymentSchema,
-  dominicanDate,
   entityIdSchema,
   goalContributionSchema,
   monthSchema,
   openingBalanceSchema,
+  updateExpenseCategorySchema,
   updateRecurringMovementSchema
-} from "@ahorra/domain";
+} from "@ahorra/domain/schemas";
 import cors from "@fastify/cors";
 import Fastify, { type FastifyRequest } from "fastify";
 import {

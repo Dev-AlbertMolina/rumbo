@@ -6,13 +6,13 @@ import {
   calculateSummary,
   dominicanDate,
   calculateBalance,
-  createRecurringMovementSchemaChecked,
   calculateDebtProgress,
   nextRecurrenceDate,
   summarizeDebts,
   type BalanceTotals,
   type Movement
 } from "./index.js";
+import { createRecurringMovementSchemaChecked } from "./schemas.js";
 
 const base = {
   spaceId: "personal",

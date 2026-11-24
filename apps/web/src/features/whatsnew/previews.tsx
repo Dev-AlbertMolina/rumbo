@@ -453,7 +453,7 @@ const SPEED_ROWS = [
     label: "Primera carga en el teléfono",
     unit: "KB",
     before: 541,
-    after: 518,
+    after: 430,
     note: "lo que hay que descargar antes de ver algo"
   },
   {

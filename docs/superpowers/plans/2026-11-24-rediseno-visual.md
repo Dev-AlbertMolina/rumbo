@@ -46,11 +46,11 @@ Valen para todas las tareas.
 
 - **El arranque no puede crecer.** Medido sobre la compilación de producción
   tras la actualización de seguridad de la tarea 8: `dist/assets/index-*.js`
-  = 518.251 bytes. Ninguna tarea puede dejarlo por encima de **520.000
-  bytes**. Se comprueba con `npm run build -w @ahorra/web` y
+  = 429.501 bytes tras la tarea 11. Ninguna tarea puede dejarlo por encima de
+  **435.000 bytes**. Se comprueba con `npm run build -w @ahorra/web` y
   `stat -c %s dist/assets/index-*.js`.
-  (Eran 497.869 antes de subir zod de 4.1 a 4.6 para cerrar el aviso de
-  seguridad; esos 20 KB los recupera la tarea 11, y con creces.)
+  (Eran 497.869 antes de subir zod para cerrar el aviso de seguridad, que
+  costo 20 KB; sacar zod del navegador devolvio esos y 68 mas.)
 - **Nada de modo oscuro.** Descartado por el dueño. Los tokens se escriben de
   forma que admitirlo después sea posible, pero no se añade ningún tema.
 - **Contraste medido, no estimado:** texto ≥ 4.5:1 contra su fondo; marcas de
