@@ -272,3 +272,136 @@ decidió el plan de gráficos, llevado al plano visual.
 - [ ] **Paso 7: Novedades** — añadir la entrada de esta versión con su vista
   previa, montando componentes reales como las demás.
 - [ ] **Paso 8: commit** — `feat(web): el rediseño, repasado de punta a punta`
+
+---
+
+# Parte B — Seguridad
+
+Añadida a petición del dueño: "que evite problemas externos e internos de la
+app". No es una lista de buenas prácticas: sale de auditar este repositorio el
+2026-11-24. Cada tarea arregla algo que encontré, y queda escrito también lo
+que ya estaba bien, para que nadie lo "arregle" después.
+
+**Las tareas 8 a 10 no dependen de las 1 a 7.** Si hay que elegir, **empiezan
+ellas**: una de las dependencias tiene un aviso crítico que afecta al APK que
+ya repartes.
+
+## Lo que ya está bien (no tocar)
+
+- **Los recibos están guardados en privado.** El bucket es `public: false` y
+  las políticas exigen que la primera carpeta de la ruta sea el id de quien
+  pide el archivo. Es la pieza más delicada —una foto de recibo lleva nombres,
+  direcciones, a veces números de tarjeta— y está resuelta.
+- **No hay secretos en el repositorio.** Solo `.env.example` y un
+  `.env.native` que contiene una URL pública y lo dice.
+- **Las consultas van parametrizadas** (`$1`, `$2`): no hay inyección de SQL.
+- **El service worker no guarda datos financieros**: precarga archivos
+  estáticos, no respuestas de la API.
+- **La entrada se valida con Zod** antes de tocar la base.
+
+## Lo que encontré
+
+| | Hallazgo | Qué pasa si no se toca |
+| --- | --- | --- |
+| **E1** | `vercel.json` no define ninguna cabecera de seguridad | Sin CSP, sin HSTS, sin `frame-ancestors`: la app se puede meter en un iframe ajeno y un XSS no encuentra freno |
+| **E2** | 4 dependencias con avisos: `@capacitor/android` **crítico** (contenido remoto cargado en el origen de la app), `zod` y `fast-uri` altos | El crítico afecta al APK que ya repartes; el de `zod` permite agotar la memoria de la API con una petición grande |
+| **E3** | La API no tiene límite de peticiones | En serverless eso es factura y carga de base; y `/api/health` es pública |
+| **E4** | CORS permite siempre `http://localhost` y `capacitor://localhost` | Riesgo bajo (el token va en cabecera, no en cookie), pero es una puerta que no hace falta tener abierta en la web |
+| **I1** | El aislamiento entre personas depende de que cada consulta lleve `user_id`; la API entra con `DATABASE_URL` directo, así que las políticas RLS casi seguro no se aplican | Una sola consulta sin esa cláusula enseña el dinero de otra persona |
+| **I2** | Cerrar sesión no borra la base local | Los movimientos pendientes —montos, descripciones, categorías— se quedan en el aparato. En un teléfono prestado, eso es tu dinero a la vista |
+| **I3** | La prueba que comprueba el aislamiento existe, pero vive entre las 9 que exigen Docker | Nadie la corre. Una prueba que no corre no protege de nada |
+
+---
+
+### Tarea 8: Dependencias al día, y un guardia que avise
+
+**Archivos:**
+- Modificar: `package.json`, `apps/api/package.json`, `apps/web/package.json`
+- Crear: `.github/workflows/audit.yml`
+
+- [ ] **Paso 1: ver el tamaño del problema** — `npm audit --omit=dev`
+  Esperado: 4 vulnerabilidades (3 altas, 1 crítica).
+- [ ] **Paso 2: subir lo que se pueda sin romper nada** — `npm audit fix`
+  (sin `--force`: solo lo compatible).
+- [ ] **Paso 3: comprobar que nada se rompió** — `npm test` y
+  `npm run build -w @ahorra/web`.
+  Esperado: todo verde salvo las 9 de integración.
+- [ ] **Paso 4: el APK** — si `@capacitor/android` necesita un salto mayor,
+  compilar el APK antes de darlo por bueno: es lo que no cubre ninguna prueba.
+- [ ] **Paso 5: el guardia** — `audit.yml`, semanal y a mano, que falle si
+  aparece algo alto o crítico. Con `timeout-minutes` y `permissions: {}`, que
+  es lo que al vigilante diario le falta.
+- [ ] **Paso 6: commit** — `chore: dependencias al dia, y un aviso semanal`
+
+### Tarea 9: Cabeceras y límite de peticiones
+
+**Archivos:**
+- Modificar: `vercel.json`, `apps/api/src/app.ts`, `apps/api/package.json`
+- Crear: `apps/web/src/headers.test.ts`, `apps/api/src/limits.test.ts`
+
+**Interfaces:**
+- Produce: la sección `headers` de `vercel.json` y el registro de
+  `@fastify/rate-limit` en `buildApp`.
+
+- [ ] **Paso 1: la prueba que falla (cabeceras)** — leer `vercel.json` y
+  exigir `Content-Security-Policy`, `Strict-Transport-Security`,
+  `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy: strict-origin-when-cross-origin` y `frame-ancestors 'none'`
+  para todas las rutas.
+- [ ] **Paso 2: verla fallar** — Esperado: FALLA, no hay sección `headers`.
+- [ ] **Paso 3: escribirlas.** La CSP tiene que admitir lo que la app usa de
+  verdad: Supabase (API y storage) y nada más; sin `unsafe-inline` en scripts.
+- [ ] **Paso 4: comprobarla en el navegador** antes de darla por buena: una
+  CSP mal puesta deja la app en blanco, y eso no lo ve ninguna prueba.
+- [ ] **Paso 5: la prueba que falla (límite)** — 100 peticiones seguidas desde
+  la misma sesión reciben un 429 antes de la última.
+- [ ] **Paso 6: verla fallar**, registrar `@fastify/rate-limit` con un cubo por
+  usuario (y por IP en `/api/health`), y verla pasar.
+- [ ] **Paso 7: CORS por despliegue** — en producción, solo los orígenes de
+  `CORS_ORIGIN` y los nativos; los `localhost` de desarrollo solo cuando
+  `NODE_ENV !== "production"`. Con su prueba.
+- [ ] **Paso 8: commit** — `feat(api,web): cabeceras, limite de peticiones y CORS por despliegue`
+
+### Tarea 10: Que el aislamiento no dependa de acordarse
+
+Es el hallazgo que más caro sale si falla, y hoy lo sostiene la disciplina de
+quien escribe cada consulta.
+
+**Archivos:**
+- Crear: `apps/api/src/isolation.test.ts`
+- Modificar: `apps/api/src/database/postgres/repository.ts` (solo si algo sale)
+- Crear: `supabase/migrations/<fecha>_force_rls.sql`
+- Modificar: `apps/web/src/features/auth/AuthProvider.tsx`,
+  `apps/web/src/lib/offline/outbox.ts`
+
+- [ ] **Paso 1: la prueba que falla (sin base)** — recorrer el fuente de
+  `repository.ts` y exigir que toda consulta a una tabla con `user_id` lleve
+  `user_id = $` en su `where`. Es una prueba de texto, sí, pero corre sin
+  Docker, que es justo lo que le falta a la que ya existe.
+- [ ] **Paso 2: verla fallar o pasar.** Si pasa a la primera, ya es un
+  cerrojo: lo que protege es la consulta que alguien escriba mañana.
+- [ ] **Paso 3: forzar RLS en la base** — `alter table ... force row level
+  security` en las tablas con `user_id`, para que las políticas se apliquen
+  también al rol dueño con el que entra la API.
+- [ ] **Paso 4: probarlo contra Postgres de verdad** — esta sí necesita
+  `supabase start`; es un cambio mayor y para eso el dueño sí acepta levantar
+  Docker. Esperado: con el token de A, cero filas de B.
+- [ ] **Paso 5: la prueba que falla (aparato compartido)** — tras cerrar
+  sesión, la base local no conserva ningún movimiento pendiente de quien salió.
+- [ ] **Paso 6: borrar lo local al cerrar sesión**, avisando antes si queda
+  algo sin enviar: perder un gasto sin subir sería peor que el riesgo que
+  evitamos.
+- [ ] **Paso 7: `npm test`** y commit —
+  `feat: el aislamiento deja de depender de acordarse`
+
+## Lo que esta parte NO cubre
+
+Para que quede dicho y no se confunda con estar resuelto:
+
+- **Verificación en dos pasos.** Es de Supabase y es decisión del dueño.
+- **Cifrado de la base local.** IndexedDB no se cifra; lo que hacemos es
+  borrarla al salir.
+- **Registro de quién vio qué.** No hay auditoría de accesos, y para una app
+  de una persona por cuenta no hace falta todavía.
+- **Copias de seguridad.** Las hace Supabase en su plan; nadie las ha probado
+  restaurando. Eso merece su propio día.
