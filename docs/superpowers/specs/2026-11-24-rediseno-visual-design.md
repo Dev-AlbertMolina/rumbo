@@ -64,6 +64,29 @@ reflejo de toda interfaz generada en los ultimos anos; el papel crema con
 terracota es, exactamente, la combinacion que mas se repite en diseno hecho con
 IA; y hay seis colores de estado compitiendo sin jerarquia.
 
+## Lo que mide mal hoy
+
+Medido con el validador de paletas de la skill de visualizacion, sobre los seis
+colores que Rumbo usa como categorias (ciruela, terracota, dorado, verde, rojo,
+violeta):
+
+| Comprobacion | Resultado |
+| --- | --- |
+| Separacion para daltonismo | **FALLA**: rojo #b3263e y verde #267052 quedan a 5.5 de distancia (el minimo es 8) en deuteranopia |
+| Croma minimo | **FALLA**: el verde #267052 tiene 0.088 de croma; se lee casi gris |
+| Banda de luminosidad | **FALLA**: el ciruela #6b2948 queda fuera de la banda util como color de dato |
+| Contraste contra la superficie | **AVISO**: el dorado #e3a72f da 2.08:1, por debajo de 3:1 |
+| Separacion a ojo normal | PASA: ciruela y terracota quedan a 16.8 |
+
+El primero no es teorico y no es menor. En Deudas, **el verde significa que te
+deben y el rojo que debes**: para la forma mas comun de daltonismo, que afecta
+a cerca de uno de cada doce hombres, esos dos estados se ven casi iguales. Hoy
+lo salva que cada tarjeta lleva etiqueta de texto; el color, por si solo, miente.
+
+Eso convierte la reconstruccion del color de "estaria bien" en "hay que
+hacerlo", y da el criterio: la pareja debe/te deben tiene que separarse por
+tono **y** por luminosidad, no solo por tono.
+
 ## Referencias, y una que se rechaza
 
 La base de datos de la skill de UI recomienda para "personal finance tracker":
