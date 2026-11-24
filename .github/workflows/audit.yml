@@ -1,0 +1,36 @@
+# Repaso semanal de las dependencias.
+#
+# Los avisos de seguridad no llegan solos: aparecen cuando alguien mira. El
+# 2026-11-24 habia cuatro sin ver, uno critico, en el paquete de Android que
+# empaqueta el APK que la gente ya tiene instalado. Esto es el que mira.
+#
+# Solo cuentan las dependencias de produccion (`--omit=dev`): un aviso en una
+# herramienta de compilacion no viaja al telefono de nadie, y mezclarlos
+# convierte el aviso en ruido que se acaba ignorando.
+name: Audit
+
+on:
+  schedule:
+    # Lunes a las 12:00 UTC = 08:00 en Republica Dominicana.
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+# Solo necesita leer el codigo. Sin esto hereda los permisos del repositorio,
+# que son mas de los que hace falta darle a algo que corre solo.
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    # Si tarda mas que esto, es que algo va mal, no que haya mucho que mirar.
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Nada alto ni critico en lo que llega al usuario
+        run: npm audit --omit=dev --audit-level=high

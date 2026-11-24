@@ -18,10 +18,14 @@
   --terracotta-bg: #fdeee6;
   --terracotta-border: #edc3ac;
   --accent: #e3a72f;
-  --success: #267052;
+  /* Verde de marca: barras, puntos, bordes. 3.32:1 sobre papel y croma 0.129,
+     frente al 0.088 de antes, que se leia gris. */
+  --success: #0f9c6e;
+  /* Verde de letra: 5.66:1. Ningun verde sirve para las dos cosas. */
+  --success-ink: #267052;
   --success-bg: #e7f4ee;
   --success-border: #a8d5c1;
-  --danger: #b3263e;
+  --danger: #a31f33;
   --danger-active: #8f1e30;
   --danger-bg: #fff0f2;
   --danger-border: #f3cfd7;
@@ -692,7 +696,7 @@ h2 {
 .auth-message {
   padding: 12px 16px;
   background: var(--success-bg);
-  color: var(--success);
+  color: var(--success-ink);
   border: 1px solid var(--success-border);
   border-radius: var(--radius-md);
   font-size: var(--text-base);
@@ -1305,7 +1309,7 @@ h2 {
   border-color: var(--success-border);
 }
 .debts-overview-figure.loan .debts-overview-label {
-  color: var(--success);
+  color: var(--success-ink);
 }
 .debts-overview-figure.san {
   background: var(--gold-bg);
@@ -1400,7 +1404,7 @@ h2 {
 }
 .option-card.loan.selected > svg,
 .option-card.loan.selected strong {
-  color: var(--success);
+  color: var(--success-ink);
 }
 .option-card.san.selected > svg,
 .option-card.san.selected strong {
@@ -1424,7 +1428,7 @@ h2 {
 }
 .option-card.income.selected > svg,
 .option-card.income.selected strong {
-  color: var(--success);
+  color: var(--success-ink);
 }
 .option-card.contribution.selected > svg,
 .option-card.contribution.selected strong {
@@ -1503,7 +1507,7 @@ h2 {
 }
 .debt-kind.loan {
   background: var(--success-bg);
-  color: var(--success);
+  color: var(--success-ink);
 }
 .debt-kind.san {
   background: var(--gold-bg);
@@ -1622,7 +1626,7 @@ h2 {
   margin-top: 1px;
 }
 .san-net.lending {
-  color: var(--success);
+  color: var(--success-ink);
   background: var(--success-bg);
   border-color: var(--success-border);
 }
@@ -2101,11 +2105,11 @@ h2 {
   color: var(--terracotta);
 }
 .movement-icon.income {
-  color: var(--success);
+  color: var(--success-ink);
   background: var(--success-bg);
 }
 .amount-income {
-  color: var(--success);
+  color: var(--success-ink);
 }
 /* Inicio: el disponible del mes dia a dia (MonthBalanceChart). Ocupa todo el
    ancho, porque es la respuesta principal de la pantalla. */
@@ -2830,7 +2834,7 @@ h2 {
 .status-pill.registered,
 .status-pill.active {
   background: var(--success-bg);
-  color: var(--success);
+  color: var(--success-ink);
 }
 .status-pill.scheduled,
 .status-pill.paused {
@@ -3262,7 +3266,7 @@ h2 {
   margin-top: 1px;
 }
 .goal-pace.on-track {
-  color: var(--success);
+  color: var(--success-ink);
   background: var(--success-bg);
   border-color: var(--success-border);
 }
@@ -3445,7 +3449,7 @@ h2 {
   color: var(--terracotta);
 }
 .changes-list .down .changes-value {
-  color: var(--success);
+  color: var(--success-ink);
 }
 .changes-more {
   margin: 14px 0 0;
@@ -3553,7 +3557,7 @@ h2 {
   gap: 10px;
 }
 .privacy-card h2 svg {
-  color: var(--success);
+  color: var(--success-ink);
   flex-shrink: 0;
 }
 .sr-only {

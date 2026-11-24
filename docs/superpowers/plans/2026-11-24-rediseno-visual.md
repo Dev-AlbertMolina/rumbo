@@ -136,10 +136,10 @@ deuteranopia, por debajo del mínimo de 8, y el verde se lee gris.
   nuevas; son unas 60 líneas de aritmética).
 - [ ] **Paso 4: volver a correr** — Esperado: FALLA, pero ahora por el par
   deuda/préstamo a 5.5 y por el croma del verde. Ese es el fallo de verdad.
-- [ ] **Paso 5: cambiar los dos colores** a `--success: #3faa78` y
+- [ ] **Paso 5: cambiar los dos colores** a `--success: #0f9c6e` y
   `--danger: #a31f33` en `styles.css` y en `DATA_COLORS`, y ajustar sus
   variantes `-bg` y `-border` para que sigan dando ≥ 4.5:1 con su texto.
-- [ ] **Paso 6: verde oscuro aparte para texto.** `#3faa78` da 2.83:1 sobre
+- [ ] **Paso 6: verde oscuro aparte para texto.** `#0f9c6e` da 3.32:1 sobre
   papel: sirve para barras y puntos, no para letras. Añadir `--success-ink`
   para el texto en verde y una prueba que exija ≥ 4.5:1.
 - [ ] **Paso 7: correr todo** — `npm test` desde la raíz.

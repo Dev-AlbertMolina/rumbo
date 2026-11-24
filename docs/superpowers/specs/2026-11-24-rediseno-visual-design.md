@@ -91,13 +91,26 @@ tono **y** por luminosidad, no solo por tono.
 
 Probado contra el mismo validador hasta que paso:
 
-| Papel | Hoy | Propuesto | Que cambia |
+| Papel | Hoy | Aplicado | Que cambia |
 | --- | --- | --- | --- |
-| Entra / te deben | #267052 | **#3faa78** | Mas claro y mas saturado: deja de leerse gris |
-| Debes / peligro | #b3263e | **#a31f33** | Mas oscuro, para separarse por luminosidad y no solo por tono |
+| Entra / te deben (marca) | #267052 | **#0f9c6e** | Mas claro y mas saturado: croma 0.088 -> 0.129, deja de leerse gris |
+| Entra / te deben (texto) | #267052 | **#267052** | Se queda: 5.66:1. Ningun verde sirve a la vez de marca y de letra |
+| Debes / peligro | #b3263e | **#a31f33** | Mas oscuro: 6.11:1 -> 7.12:1 y mas separado por luminosidad |
 
-Resultado medido de esa pareja: separacion para daltonismo **18.4**, frente al
-5.5 de hoy y un minimo exigible de 8. A ojo normal, 28.4.
+Resultado medido al implementarlo, y dos correcciones a lo que decia este
+documento antes de hacerlo:
+
+- El #3faa78 que proponia esta propuesta **no llega** al minimo de contraste de
+  una marca: 2.76:1 contra el papel, por debajo de 3:1. Se cambio por #0f9c6e,
+  que da 3.32:1 con mas croma todavia (0.129).
+- El par que de verdad se confunde en Deudas **no es verde contra rojo**, es la
+  barra verde contra la barra terracota: 8.7 para deuteranopia pero **7.0 para
+  protanopia**, por debajo del minimo. Con el verde nuevo pasa a 19.5.
+
+Y un hallazgo que cambia el enfoque: **ningun verde legible como texto
+(4.5:1 o mas) se separa de un rojo legible** para deuteranopia; todos los
+candidatos medidos quedan entre 4.2 y 7.5. En letra, el color no puede cargar
+ese significado, y por eso cada tarjeta seguira llevando su palabra.
 
 Dos notas que vienen con la propuesta:
 
