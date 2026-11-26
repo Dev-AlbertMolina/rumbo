@@ -7,9 +7,12 @@ import {
   DebtKindPickerPreview,
   DebtsModulePreview,
   GoalPacePreview,
+  MonthAnswerPreview,
   MonthBalancePreview,
   MonthSwitchPreview,
   MovementsMobilePreview,
+  NavWeightPreview,
+  PendingMarkPreview,
   OfflinePreview,
   ReceiptPreview,
   RecurrencePreview,
@@ -34,6 +37,9 @@ import {
  * ninguna quede huerfana.
  */
 export const RELEASE_PREVIEWS: Record<string, ComponentType> = {
+  "Inicio te dice si llegas a fin de mes": MonthAnswerPreview,
+  "La pestaña en la que estás se nota sin mirar el color": NavWeightPreview,
+  "Lo que aún no ha pasado se ve de un golpe": PendingMarkPreview,
   "Abre más rápido en el teléfono": StartupSpeedPreview,
   "Cambiar de mes ya no parpadea": MonthSwitchPreview,
   "Vuelves donde estabas": ViewMemoryPreview,

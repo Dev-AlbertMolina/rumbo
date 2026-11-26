@@ -266,20 +266,18 @@ decidió el plan de gráficos, llevado al plano visual.
 - Modificar: `apps/web/src/features/movements/*`
 - Crear: `apps/web/src/a11y.test.ts`
 
-- [ ] **Paso 1: la prueba que falla** — recorrer los pares de color que
-  significan cosas distintas en una misma pantalla y exigir ≥ 8 de separación
-  para daltonismo; y que todo estado con color tenga además texto o forma.
+- [x] **Paso 1-3: hecho.** Lo que salió: la barra de ahorro de Reportes iba en
+  dorado, 2.03:1 contra el papel. Las tres barras pasan al idioma de la app
+  —entra, sale, se aparta— y quedan por encima de 3:1 y a más de 15 entre sí.
 - [ ] **Paso 2: verla fallar** si queda alguno.
 - [ ] **Paso 3: corregir** lo que saque.
-- [ ] **Paso 4: más categorías que colores** — prueba con nueve categorías de
-  gasto: a partir del último color de la paleta, las demás se agrupan en
-  "Otros" en vez de repetir color. Repetir color sin repetir forma hace
-  ilegible el gráfico, y es el caso que más fácil se cuela.
+- [x] **Paso 4: ya estaba resuelto** — el gráfico de categorías muestra las
+  cinco primeras y agrupa el resto en "Otras (N)".
 - [ ] **Paso 5: medir el arranque** por última vez.
   Esperado: por debajo de 500.000 bytes.
 - [ ] **Paso 6: `npm test` y `npm run lint`** desde la raíz.
-- [ ] **Paso 7: Novedades** — añadir la entrada de esta versión con su vista
-  previa, montando componentes reales como las demás.
+- [x] **Paso 7: Novedades** — la 1.1, con cinco entradas y tres vistas previas
+  montadas con los componentes de verdad.
 - [ ] **Paso 8: commit** — `feat(web): el rediseño, repasado de punta a punta`
 
 ---

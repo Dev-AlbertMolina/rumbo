@@ -35,6 +35,48 @@ export interface Release {
  */
 export const RELEASES: Release[] = [
   {
+    version: "1.1",
+    date: "2026-11-26",
+    title: "Se ve mejor, y te dice si llegas",
+    summary:
+      "Inicio deja de ser un tablero de cifras y contesta una pregunta. Y la app estrena iconos, tipografía y colores medidos uno a uno.",
+    entries: [
+      {
+        title: "Inicio te dice si llegas a fin de mes",
+        hasPreview: true,
+        description:
+          "Antes abrías y veías tu disponible: una cifra que no dice nada por sí sola, porque RD$28,500 es mucho el día 2 y poco el día 28. Ahora la app hace la cuenta por ti, mirando cómo cierra el mes con lo que ya tienes programado —el san, la tarjeta, la quincena—, y te lo dice en una frase. Lo más útil es el aviso del medio: cuando el mes cierra bien pero hay un día en que no te alcanza porque lo que entra llega después.",
+        where: "Inicio"
+      },
+      {
+        title: "La pestaña en la que estás se nota sin mirar el color",
+        hasPreview: true,
+        description:
+          "Los iconos son nuevos y, sobre todo, tienen peso: el de la sección en la que estás se dibuja relleno y los demás en contorno. Antes eso dependía solo del color, y el color se le escapa a cerca de uno de cada doce hombres. Ahora se distingue hasta en blanco y negro.",
+        where: "En toda la app"
+      },
+      {
+        title: "Lo que aún no ha pasado se ve de un golpe",
+        hasPreview: true,
+        description:
+          "Lo programado, lo que se repite, lo que está en pausa y lo que espera conexión llevan ahora una marca morada: en el icono y la etiqueta, nunca de fondo, para que el color no pese más que las cifras. Y como lo que ya ocurrió va relleno y lo pendiente en contorno, la diferencia también se ve sin color.",
+        where: "Movimientos, Deudas y Metas"
+      },
+      {
+        title: "Los colores dejaron de elegirse a ojo",
+        description:
+          "En Deudas, el verde de lo que te deben y el terracota de lo que debes quedaban casi iguales para la forma más común de daltonismo. Lo medimos: 7 de separación cuando el mínimo son 8. El verde nuevo está en 19,5. Y de paso, el anillo que marca dónde estás al moverte con el teclado estaba en dorado sobre papel crema —prácticamente invisible— y ahora se ve siempre.",
+        where: "En toda la app"
+      },
+      {
+        title: "Más ligera, y con la puerta mejor cerrada",
+        description:
+          "La primera carga pesa un 17% menos que hace una semana: la validación que solo necesita el servidor ya no viaja a tu teléfono. Además la app manda ahora las cabeceras de seguridad que le faltaban, la API tiene tope de peticiones, y se cerraron cuatro avisos de seguridad en las librerías, uno de ellos crítico y en el paquete que arma la app de Android.",
+        where: "En toda la app"
+      }
+    ]
+  },
+  {
     version: "1.0",
     date: "2026-11-24",
     title: "Más rápida, y se cuida sola",

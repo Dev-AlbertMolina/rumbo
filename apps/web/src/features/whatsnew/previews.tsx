@@ -24,6 +24,10 @@ import { SanProgress } from "../debts/SanProgress";
 import { GoalPaceNote } from "../goals/GoalPaceNote";
 import { RecurrencesPanel } from "../movements/RecurrencesPanel";
 import { ReminderCard } from "../settings/ReminderCard";
+import { MonthAnswer } from "../dashboard/MonthAnswer";
+import { BottomNav } from "../../components/layout/BottomNav";
+import { StatusPill } from "../../components/StatusPill";
+import { ICON_TEXT, Repeat } from "../../components/icons";
 import { PageFallback } from "../../components/PageFallback";
 import { MovementsPage } from "../movements/MovementsPage";
 import { rememberFilters } from "../../app/viewMemory";
@@ -453,7 +457,7 @@ const SPEED_ROWS = [
     label: "Primera carga en el teléfono",
     unit: "KB",
     before: 541,
-    after: 449,
+    after: 451,
     note: "lo que hay que descargar antes de ver algo"
   },
   {
@@ -546,6 +550,74 @@ export function ViewMemoryPreview() {
         onEdit={noop}
         viewPath={MEMORY_EXAMPLE_PATH}
       />
+    </div>
+  );
+}
+
+/** El Inicio nuevo, con el caso que mas importa: cierra bien pero hay un dia
+    en que no alcanza. */
+export function MonthAnswerPreview() {
+  const mes = today().slice(0, 7);
+  const dia = (d: number) => `${mes}-${String(d).padStart(2, "0")}`;
+  const hoy = Number(today().slice(8, 10));
+  const movimiento = (
+    d: number,
+    type: "INCOME" | "EXPENSE",
+    cents: number,
+    description: string
+  ): Movement => ({
+    id: `${type}-${d}`,
+    spaceId: SPACE,
+    type,
+    status: d <= hoy ? "REGISTERED" : "SCHEDULED",
+    amountCents: cents,
+    effectiveDate: dia(d),
+    description,
+    category: "Alimentacion",
+    createdAt: `${dia(1)}T12:00:00.000Z`
+  });
+
+  return (
+    <div className="hero">
+      <div>
+        <MonthAnswer
+          month={mes}
+          today={today()}
+          movements={[
+            movimiento(1, "INCOME", 32_000_00, "Quincena"),
+            movimiento(5, "EXPENSE", 18_000_00, "Alquiler"),
+            movimiento(Math.min(hoy, 20), "EXPENSE", 11_500_00, "Supermercado"),
+            movimiento(Math.min(28, hoy + 4), "INCOME", 32_000_00, "Quincena")
+          ]}
+          availableCents={2_500_00}
+        />
+      </div>
+    </div>
+  );
+}
+
+/** El peso del icono dice en que pestana estas. */
+export function NavWeightPreview() {
+  return (
+    <div className="preview-nav">
+      <BottomNav pathname="/metas" />
+    </div>
+  );
+}
+
+/** Lo que todavia no ha pasado, marcado sin que el color ocupe media pantalla. */
+export function PendingMarkPreview() {
+  return (
+    <div style={{ display: "grid", gap: 12, justifyItems: "start" }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <StatusPill tone="registered" label="Registrado" />
+        <StatusPill tone="scheduled" label="Programado" />
+        <StatusPill tone="paused" label="En pausa" />
+      </div>
+      <span className="recurrence-badge pending">
+        <Repeat size={ICON_TEXT} aria-hidden="true" />
+        Se repite cada mes
+      </span>
     </div>
   );
 }

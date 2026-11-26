@@ -2048,14 +2048,17 @@ h2 {
   min-height: 2px;
   transition: height 0.35s var(--ease-out);
 }
+/* Las tres barras de Reportes hablan el idioma de la app: lo que entra, lo
+   que sale y lo que se aparta. El dorado que llevaba la de ahorro daba 2.03:1
+   contra el papel: una marca que casi no se despega del fondo. */
 .bar-0 {
-  background: var(--primary);
+  background: var(--success);
 }
 .bar-1 {
   background: var(--terracotta);
 }
 .bar-2 {
-  background: var(--accent);
+  background: var(--primary);
 }
 .category-list {
   display: grid;
@@ -4242,4 +4245,11 @@ h2 {
 }
 .month-row b.out {
   color: var(--terracotta);
+}
+
+/* La barra de abajo, dentro de una vista previa: fuera de su sitio fijo. */
+.preview-nav .bottom-nav {
+  position: static;
+  display: grid;
+  border-radius: var(--radius-md);
 }
