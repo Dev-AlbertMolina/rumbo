@@ -620,3 +620,37 @@ export type {
   DebtPaymentInput,
   OpeningBalanceInput
 } from "./schemas.js";
+
+/**
+ * La respuesta de Inicio: si llegas a fin de mes.
+ *
+ * - `ok`: el mes cierra en positivo y nunca cae por debajo de cero.
+ * - `tight`: cierra bien, pero hay dias en los que no alcanza. Es el caso que
+ *   mas importa avisar: decir "vas bien" cuando el dia 20 te quedas sin nada
+ *   y el sueldo entra el 25 es peor que no decir nada.
+ * - `short`: el mes cierra en negativo.
+ */
+export interface MonthVerdict {
+  kind: "ok" | "tight" | "short";
+  /** Lo que sobra (ok, tight) o lo que falta (short), siempre positivo. */
+  amountCents: number;
+  /** Dias que quedan del mes, contando hoy. Cero si el mes ya termino. */
+  daysLeft: number;
+  /** El primer dia en que no alcanza, cuando lo hay. */
+  firstShortDay?: number;
+}
+
+export function monthVerdict(balance: MonthBalance, month: string): MonthVerdict {
+  const [year, monthNumber] = month.split("-").map(Number);
+  const daysInMonth = new Date(Date.UTC(year!, monthNumber!, 0)).getUTCDate();
+  const daysLeft = Math.max(0, daysInMonth - balance.lastRegisteredDay);
+
+  const firstShortDay = balance.negativeDays[0];
+  if (balance.endCents < 0) {
+    return { kind: "short", amountCents: Math.abs(balance.endCents), daysLeft, firstShortDay };
+  }
+  if (firstShortDay !== undefined) {
+    return { kind: "tight", amountCents: balance.endCents, daysLeft, firstShortDay };
+  }
+  return { kind: "ok", amountCents: balance.endCents, daysLeft };
+}

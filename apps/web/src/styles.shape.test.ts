@@ -118,3 +118,38 @@ describe("el foco del teclado", () => {
     expect(dorados, "anillos de foco en dorado").toEqual([]);
   });
 });
+
+/**
+ * La jerarquia de Inicio: una respuesta manda y lo demas se subordina.
+ *
+ * Es la regla que se rompe sola con el tiempo: alguien agranda un titulo
+ * "solo un poco" y la pantalla vuelve a ser un tablero donde todo pesa igual.
+ */
+describe("la pantalla de Inicio", () => {
+  function fontSize(selector: string): number {
+    const block = css.match(new RegExp(`${selector}\\s*\\{[^}]*\\}`))?.[0] ?? "";
+    let declared = block.match(/font-size:\s*([^;]+);/)?.[1] ?? "";
+    // Un tamano puede venir por token: se resuelve contra :root.
+    const tokenName = declared.match(/var\((--[\w-]+)\)/)?.[1];
+    if (tokenName) {
+      declared = css.match(new RegExp(`${tokenName}:\\s*([^;]+);`))?.[1] ?? "";
+    }
+    const smallest = declared.match(/(\d+)px/);
+    if (!smallest) throw new Error(`${selector} no declara un tamano en px`);
+    return Number(smallest[1]);
+  }
+
+  it("la cifra es lo mas grande de la pantalla", () => {
+    const cifra = fontSize("\\.month-answer-amount");
+    expect(cifra).toBeGreaterThanOrEqual(38);
+    expect(fontSize("\\.month-answer-question")).toBeLessThan(cifra);
+  });
+
+  it("lo que entro y salio son lineas, no tarjetas", () => {
+    // Si vuelven a ser tarjetas compiten con la respuesta, que es justo lo
+    // que esta pantalla dejo de hacer.
+    const fila = css.match(/\.month-row\s*\{[^}]*\}/)?.[0] ?? "";
+    expect(fila).toMatch(/border-bottom/);
+    expect(fila).not.toMatch(/box-shadow|border-radius/);
+  });
+});

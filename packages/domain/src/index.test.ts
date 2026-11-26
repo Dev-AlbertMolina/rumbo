@@ -9,6 +9,7 @@ import {
   calculateDebtProgress,
   nextRecurrenceDate,
   summarizeDebts,
+  monthVerdict,
   type BalanceTotals,
   type Movement
 } from "./index.js";
@@ -593,5 +594,84 @@ describe("calculateMonthBalance", () => {
     expect(balance.points.some((point) => point.registered)).toBe(false);
     expect(balance.negativeDays[0]).toBe(5);
     expect(balance.endCents).toBe(-800_00);
+  });
+});
+
+/**
+ * La respuesta de la pantalla de Inicio.
+ *
+ * Inicio deja de ser un tablero de cifras y pasa a contestar una pregunta:
+ * si llegas a fin de mes. La cifra sola no la contesta —RD$28,500 es mucho el
+ * dia 2 y poco el dia 28—, asi que hay que mirar como cierra el mes contando
+ * lo programado, y si en el camino se cae por debajo de cero.
+ */
+describe("monthVerdict", () => {
+  const month = "2026-11";
+  const gasto = (day: number, amountCents: number): Movement => ({
+    id: `g${day}`,
+    spaceId: "personal",
+    type: "EXPENSE",
+    status: day <= 24 ? "REGISTERED" : "SCHEDULED",
+    amountCents,
+    effectiveDate: `${month}-${String(day).padStart(2, "0")}`,
+    description: "Gasto",
+    category: "Alimentacion",
+    createdAt: `${month}-01T12:00:00.000Z`
+  });
+  const ingreso = (day: number, amountCents: number): Movement => ({
+    ...gasto(day, amountCents),
+    id: `i${day}`,
+    type: "INCOME",
+    description: "Ingreso"
+  });
+
+  it("dice con cuanto llegas cuando el mes cierra en positivo", () => {
+    const balance = calculateMonthBalance(
+      [ingreso(1, 64_000_00), gasto(5, 35_500_00)],
+      month,
+      "2026-11-24"
+    );
+
+    const verdict = monthVerdict(balance, month);
+
+    expect(verdict.kind).toBe("ok");
+    expect(verdict.amountCents).toBe(28_500_00);
+    expect(verdict.daysLeft).toBe(6);
+  });
+
+  it("avisa del dia en que te quedas corto, aunque el mes cierre bien", () => {
+    // Lo peor que puede hacer una app de dinero es decir "vas bien" cuando el
+    // dia 20 te quedas sin nada y el sueldo entra el 25.
+    const balance = calculateMonthBalance(
+      [ingreso(1, 10_000_00), gasto(20, 12_000_00), ingreso(25, 30_000_00)],
+      month,
+      "2026-11-24"
+    );
+
+    const verdict = monthVerdict(balance, month);
+
+    expect(verdict.kind).toBe("tight");
+    expect(verdict.firstShortDay).toBe(20);
+  });
+
+  it("dice cuanto falta cuando no llegas", () => {
+    const balance = calculateMonthBalance(
+      [ingreso(1, 20_000_00), gasto(10, 35_000_00)],
+      month,
+      "2026-11-24"
+    );
+
+    const verdict = monthVerdict(balance, month);
+
+    expect(verdict.kind).toBe("short");
+    expect(verdict.amountCents).toBe(15_000_00);
+  });
+
+  it("no cuenta dias que ya pasaron cuando el mes termino", () => {
+    const balance = calculateMonthBalance([ingreso(1, 5_000_00)], month, "2026-12-03");
+
+    const verdict = monthVerdict(balance, month);
+
+    expect(verdict.daysLeft).toBe(0);
   });
 });

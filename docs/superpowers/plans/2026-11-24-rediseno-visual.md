@@ -249,13 +249,13 @@ decidió el plan de gráficos, llevado al plano visual.
 - Modificar: `apps/web/src/app/App.tsx` (orden de los bloques de Inicio)
 - Crear: `apps/web/src/features/dashboard/HomeHierarchy.test.tsx`
 
-- [ ] **Paso 1: la prueba que falla** — en Inicio, el primer elemento con
-  nivel de encabezado 1 es la respuesta del mes, y la cifra grande es la única
-  que pasa de 28 px.
+- [x] **Paso 1-3: hecho.** La respuesta sale de `monthVerdict`, en el dominio:
+  llegas / cierras bien pero hay un día en que no alcanza / no llegas. El
+  caso del medio es el que justifica la tarea.
 - [ ] **Paso 2: verla fallar.**
 - [ ] **Paso 3: reordenar y rebajar** el resto de bloques.
-- [ ] **Paso 4: móvil de 375 px** — comprobar que ningún título desborda ni se
-  parte mal, con una prueba de ancho sobre los títulos más largos.
+- [x] **Paso 4: medido a 375 px** — sin desborde horizontal, la cifra en una
+  línea (38 px) y el veredicto en dos.
 - [ ] **Paso 5: verlas pasar**, `npm test`, y mirarlo en el navegador a 375 y
   a 1280.
 - [ ] **Paso 6: commit** — `feat(web): Inicio responde una sola pregunta`

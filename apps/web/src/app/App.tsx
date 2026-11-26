@@ -8,7 +8,6 @@ import { BottomNav } from "../components/layout/BottomNav";
 import { RumboLogo } from "../components/layout/RumboLogo";
 import { Sidebar } from "../components/layout/Sidebar";
 import { UserMenu } from "../components/layout/UserMenu";
-import { Stat } from "../components/Stat";
 import { CategoryChart } from "../features/dashboard/CategoryChart";
 import { BalanceCard } from "../features/dashboard/BalanceCard";
 import { EmptyState } from "../features/dashboard/EmptyState";
@@ -54,12 +53,13 @@ import { OfflineBanner } from "../components/OfflineBanner";
 import { ChunkBoundary } from "../components/ChunkBoundary";
 import { MotionProvider } from "../components/MotionProvider";
 import { StaleNotice } from "./StaleNotice";
+import { MonthAnswer } from "../features/dashboard/MonthAnswer";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { unsentBeforeSignOut, unsentWarning } from "../features/auth/signOutGuard";
 import { PageFallback } from "../components/PageFallback";
 import { Toaster } from "../components/Toaster";
 import { expenseCategories } from "../lib/categories";
-import { currentMonth, monthLabel } from "../lib/format";
+import { currentMonth, today } from "../lib/format";
 import { navigate, usePathname } from "./router";
 
 export default function App() {
@@ -199,18 +199,24 @@ export default function App() {
                   <>
                     <section className="hero" aria-labelledby="available-title">
                       <div>
-                        <p className="eyebrow">Disponible después de ahorro</p>
-                        <h1 id="available-title">
-                          {loading && !stale ? (
-                            <span
-                              className="skeleton skeleton-hero-number"
-                              aria-label="Calculando"
-                            />
-                          ) : (
-                            formatDop(animatedAvailable)
-                          )}
-                        </h1>
-                        <p>Para {monthLabel(month)} según tus registros</p>
+                        {loading && !stale ? (
+                          <>
+                            <p className="eyebrow">Disponible después de ahorro</p>
+                            <h1 id="available-title">
+                              <span
+                                className="skeleton skeleton-hero-number"
+                                aria-label="Calculando"
+                              />
+                            </h1>
+                          </>
+                        ) : (
+                          <MonthAnswer
+                            month={month}
+                            today={today()}
+                            movements={movements}
+                            availableCents={animatedAvailable}
+                          />
+                        )}
                         {(!loading || stale) && (
                           <BalanceBridge
                             beforeSavingsCents={summary.availableBeforeSavingsCents}
@@ -219,12 +225,27 @@ export default function App() {
                           />
                         )}
                       </div>
-                      <div className="hero-stats">
-                        <Stat label="Ingresos" value={summary.incomeCents} tone="income" />
-                        <Stat label="Gastos" value={summary.expenseCents} tone="expense" />
-                        <Stat label="Ahorro" value={summary.contributionCents} tone="savings" />
-                      </div>
                     </section>
+
+                    {/* Lo que entro, salio y apartaste deja de ser tres tarjetas
+                        dentro del hero compitiendo con la respuesta: son tres
+                        lineas, que es lo que son. */}
+                    {(!loading || stale) && (
+                      <div className="month-rows">
+                        <div className="month-row">
+                          <span>Entró este mes</span>
+                          <b className="in">{formatDop(summary.incomeCents)}</b>
+                        </div>
+                        <div className="month-row">
+                          <span>Salió</span>
+                          <b className="out">{formatDop(summary.expenseCents)}</b>
+                        </div>
+                        <div className="month-row">
+                          <span>Apartado para metas</span>
+                          <b>{formatDop(summary.contributionCents)}</b>
+                        </div>
+                      </div>
+                    )}
 
                     {(!loading || stale) && summary.availableAfterSavingsCents < 0 && (
                       <section className="allocation-alert" role="status">

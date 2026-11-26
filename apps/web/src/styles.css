@@ -760,7 +760,6 @@ h2 {
   border-radius: var(--radius-signature-lg);
   padding: clamp(26px, 4vw, 46px);
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
   gap: 32px;
 }
 .hero::after {
@@ -4180,4 +4179,67 @@ h2 {
   .preview-month-switch {
     grid-template-columns: 1fr;
   }
+}
+
+/* Inicio responde una pregunta: el rotulo, la pregunta, la cifra y el
+   veredicto. Todo lo demas de la pantalla baja de tamano para que esto mande. */
+.month-answer-question {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--text-lg);
+  color: var(--on-primary-soft);
+}
+.month-answer-amount {
+  margin: 0 0 10px;
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1;
+}
+.month-answer-verdict {
+  margin: 0;
+  max-width: 46ch;
+  font-size: var(--text-base);
+  color: var(--on-primary-soft);
+}
+.month-answer-verdict b {
+  color: var(--on-primary);
+}
+/* Sobre el ciruela del hero hacen falta tonos claros: el verde y el rojo de
+   las pantallas blancas no se leen aqui. Medidos, 5.8:1 y 5.3:1. */
+.month-answer-verdict b.is-ok {
+  color: var(--on-dark-success);
+}
+.month-answer-verdict b.is-short,
+.month-answer-verdict b.is-tight {
+  color: var(--on-dark-danger);
+}
+
+/* Lo que entro, salio y apartaste: tres lineas, no tres tarjetas. */
+.month-rows {
+  display: grid;
+  margin-top: 18px;
+}
+.month-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: var(--text-base);
+}
+.month-row:last-child {
+  border-bottom: 0;
+}
+.month-row span {
+  color: var(--muted);
+}
+.month-row b {
+  font-variant-numeric: tabular-nums;
+}
+.month-row b.in {
+  color: var(--success-ink);
+}
+.month-row b.out {
+  color: var(--terracotta);
 }
